@@ -8,7 +8,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to be chained.</param>
+    /// <param name="func">The asynchronous operation to be chained.</param>
     /// <returns>A task representing the result of the chained operation.</returns>
     public static async Task<Expected<T, ErrorType>> AndThenAsync<T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Func<T?, Task> func) {
         return await (await expectedTask).AndThenAsync(func);
@@ -20,7 +20,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="action">      The action to be chained.</param>
+    /// <param name="action">The action to be chained.</param>
     /// <returns>An instance of <see cref="Expected{T, ErrorType}" /> after applying the action.</returns>
     public static async ValueTask<Expected<T, ErrorType>> AndThenAsync<T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Action<T?> action) {
         return (await expectedTask).AndThen(action);
@@ -32,7 +32,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to be chained.</param>
+    /// <param name="func">The asynchronous operation to be chained.</param>
     /// <returns>A task representing the result of the chained operation.</returns>
     public static async Task<Expected<T, ErrorType>> AndThenAsync<T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Func<T?, Task> func) {
         return await (await expectedTask).AndThenAsync(func);
@@ -44,7 +44,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="action">      The action to be chained.</param>
+    /// <param name="action">The action to be chained.</param>
     /// <returns>An instance of <see cref="Expected{T, ErrorType}" /> after applying the action.</returns>
     public static async ValueTask<Expected<T, ErrorType>> AndThenAsync<T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Action<T?> action) {
         return (await expectedTask).AndThen(action);
@@ -108,7 +108,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to be chained.</param>
+    /// <param name="func">The asynchronous operation to be chained.</param>
     /// <returns>A task representing the result of the chained operation.</returns>
     public static async Task<Expected<T, ErrorType>> OrElseAsync<T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Func<ErrorType, Task> func) {
         return await (await expectedTask).OrElseAsync(func);
@@ -120,7 +120,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="action">      The action to be chained.</param>
+    /// <param name="action">The action to be chained.</param>
     /// <returns>An instance of <see cref="Expected{T, ErrorType}" /> after applying the action.</returns>
     public static async ValueTask<Expected<T, ErrorType>> OrElseAsync<T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Action<ErrorType> action) {
         return (await expectedTask).OrElse(action);
@@ -132,7 +132,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to be chained.</param>
+    /// <param name="func">The asynchronous operation to be chained.</param>
     /// <returns>A task representing the result of the chained operation.</returns>
     public static async Task<Expected<T, ErrorType>> OrElseAsync<T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Func<ErrorType, Task> func) {
         return await (await expectedTask).OrElseAsync(func);
@@ -144,7 +144,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="action">      The action to be chained.</param>
+    /// <param name="action">The action to be chained.</param>
     /// <returns>An instance of <see cref="Expected{T, ErrorType}" /> after applying the action.</returns>
     public static async ValueTask<Expected<T, ErrorType>> OrElseAsync<T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Action<ErrorType> action) {
         return (await expectedTask).OrElse(action);
@@ -157,7 +157,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to transform the value.</param>
+    /// <param name="func">The asynchronous operation to transform the value.</param>
     /// <returns>A task representing the transformed result.</returns>
     public static async Task<Expected<U, ErrorType>> TransformAsync<U, T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Func<T?, Task<U>> func) {
         return await (await expectedTask).TransformAsync(func);
@@ -170,7 +170,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to transform the value.</param>
+    /// <param name="func">The asynchronous operation to transform the value.</param>
     /// <returns>A task representing the transformed result.</returns>
     public static async Task<Expected<U, ErrorType>> TransformAsync<U, T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Func<T?, Task<U>> func) {
         return await (await expectedTask).TransformAsync(func);
@@ -183,7 +183,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to transform the error.</param>
+    /// <param name="func">The asynchronous operation to transform the error.</param>
     /// <returns>A task representing the transformed result.</returns>
     public static async Task<Expected<T, E>> TransformErrorAsync<E, T, ErrorType>(this Task<Expected<T, ErrorType>> expectedTask, Func<ErrorType, Task<E>> func) {
         return await (await expectedTask).TransformErrorAsync(func);
@@ -196,7 +196,7 @@ public static class ExpectedExt {
     /// <typeparam name="T">The type of the expected value.</typeparam>
     /// <typeparam name="ErrorType">The type of the error.</typeparam>
     /// <param name="expectedTask">The task representing the expected result.</param>
-    /// <param name="func">        The asynchronous operation to transform the error.</param>
+    /// <param name="func">The asynchronous operation to transform the error.</param>
     /// <returns>A task representing the transformed result.</returns>
     public static async Task<Expected<T, E>> TransformErrorAsync<E, T, ErrorType>(this ValueTask<Expected<T, ErrorType>> expectedTask, Func<ErrorType, Task<E>> func) {
         return await (await expectedTask).TransformErrorAsync(func);
