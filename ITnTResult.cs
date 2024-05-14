@@ -43,33 +43,6 @@ public interface ITnTResult {
         return new TnTResult(new Exception(message));
     }
 
-    /// <summary>
-    /// Executes the specified action if the result is a failure.
-    /// </summary>
-    /// <param name="action">The action to execute.</param>
-    /// <returns>The current TnTResult instance.</returns>
-    ITnTResult OnFailure(Action<Exception> action);
-
-    /// <summary>
-    /// Asynchronously executes the specified function if the result is a failure.
-    /// </summary>
-    /// <param name="func">The function to execute.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task<ITnTResult> OnFailureAsync(Func<Exception, Task> func);
-
-    /// <summary>
-    /// Executes the specified action if the result is a success.
-    /// </summary>
-    /// <param name="action">The action to execute.</param>
-    /// <returns>The current TnTResult instance.</returns>
-    ITnTResult OnSuccess(Action action);
-
-    /// <summary>
-    /// Asynchronously executes the specified function if the result is a success.
-    /// </summary>
-    /// <param name="func">The function to execute.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task<ITnTResult> OnSuccessAsync(Func<Task> func);
 }
 
 /// <summary>
@@ -109,17 +82,4 @@ public interface ITnTResult<TSuccess> : ITnTResult {
     static ITnTResult<TSuccess> Success(TSuccess? value) {
         return new TnTResult<TSuccess>(value);
     }
-
-    /// <summary>
-    /// Executes the specified action if the operation was successful.
-    /// </summary>
-    /// <param name="action">The action to execute.</param>
-    ITnTResult<TSuccess> OnSuccess(Action<TSuccess?> action);
-
-    /// <summary>
-    /// Executes the specified asynchronous function if the operation was successful.
-    /// </summary>
-    /// <param name="func">The asynchronous function to execute.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task<ITnTResult<TSuccess>> OnSuccessAsync(Func<TSuccess?, Task> func);
 }

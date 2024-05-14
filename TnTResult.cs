@@ -27,36 +27,6 @@ internal struct TnTResult : ITnTResult {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _error = error.MakeOptional();
     }
-
-    /// <inheritdoc />
-    public readonly ITnTResult OnFailure(Action<Exception> action) => OnFailureAsync((exc) => {
-        action(exc);
-        return Task.CompletedTask;
-    }).Result;
-
-    /// <inheritdoc />
-    public readonly async Task<ITnTResult> OnFailureAsync(Func<Exception, Task> func) {
-        if (!IsSuccessful) {
-            await func(_error.Value);
-        }
-        return this;
-    }
-
-    /// <inheritdoc />
-    public readonly ITnTResult OnSuccess(Action action) {
-        return OnSuccessAsync(() => {
-            action();
-            return Task.CompletedTask;
-        }).Result;
-    }
-
-    /// <inheritdoc />
-    public readonly async Task<ITnTResult> OnSuccessAsync(Func<Task> func) {
-        if (IsSuccessful) {
-            await func();
-        }
-        return this;
-    }
 }
 
 /// <summary>
@@ -87,38 +57,4 @@ internal readonly struct TnTResult<TSuccess> : ITnTResult<TSuccess> {
     internal TnTResult(TSuccess? success) {
         _expected = success.MakeExpected<TSuccess, Exception>();
     }
-
-    /// <inheritdoc />
-    public ITnTResult OnFailure(Action<Exception> action) => OnFailureAsync((exc) => {
-        action(exc);
-        return Task.CompletedTask;
-    }).Result;
-
-    /// <inheritdoc />
-    public async Task<ITnTResult> OnFailureAsync(Func<Exception, Task> func) {
-        if (!IsSuccessful) {
-            await func(Error);
-        }
-        return this;
-    }
-
-    /// <inheritdoc />
-    public readonly ITnTResult<TSuccess> OnSuccess(Action<TSuccess?> action) => OnSuccessAsync((value) => {
-        action(value);
-        return Task.CompletedTask;
-    }).Result;
-
-    /// <inheritdoc />
-    public ITnTResult OnSuccess(Action action) => OnSuccess(_ => action());
-
-    /// <inheritdoc />
-    public readonly async Task<ITnTResult<TSuccess>> OnSuccessAsync(Func<TSuccess?, Task> func) {
-        if (IsSuccessful) {
-            await func(Value);
-        }
-        return this;
-    }
-
-    /// <inheritdoc />
-    public async Task<ITnTResult> OnSuccessAsync(Func<Task> func) => await OnSuccessAsync(_ => func());
 }
