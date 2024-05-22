@@ -11,7 +11,7 @@ public class CreatedTnTResult : ITnTResult {
     /// <inheritdoc />
     public bool IsSuccessful => !_error.HasValue;
 
-    internal static CreatedTnTResult Successful => new();
+    public static CreatedTnTResult Successful => new();
 
     private readonly Optional<Exception> _error = new Exception().MakeOptional();
 
