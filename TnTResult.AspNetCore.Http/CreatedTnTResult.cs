@@ -17,7 +17,7 @@ public class CreatedTnTResult : ITnTResult {
 
     protected CreatedTnTResult() { _error = Optional<Exception>.NullOpt; }
 
-    internal CreatedTnTResult(Exception error) {
+    public CreatedTnTResult(Exception error) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _error = error.MakeOptional();
     }
@@ -29,9 +29,9 @@ public class CreatedTnTResult<TSuccess> : CreatedTnTResult, ITnTResult<TSuccess>
 
     private readonly Expected<TSuccess, Exception> _expected;
 
-    internal CreatedTnTResult(Exception error) : base(error) { }
+    public CreatedTnTResult(Exception error) : base(error) { }
 
-    internal CreatedTnTResult(TSuccess? success) : base() {
+    public CreatedTnTResult(TSuccess? success) : base() {
         _expected = success.MakeExpected<TSuccess, Exception>();
     }
 }
