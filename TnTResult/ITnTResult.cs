@@ -42,7 +42,6 @@ public interface ITnTResult {
     static ITnTResult Failure(string message) {
         return new TnTResult(new Exception(message));
     }
-
 }
 
 /// <summary>
