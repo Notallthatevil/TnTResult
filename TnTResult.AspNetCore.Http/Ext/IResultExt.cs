@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using TnTResult.Exceptions;
 
 namespace TnTResult.AspNetCore.Http.Ext;
+
 public static class IResultExt {
 
     /// <summary>
@@ -18,7 +14,7 @@ public static class IResultExt {
     /// <param name="uri">The optional URI to include in the result.</param>
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static IResult ToResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
+    public static IResult ToIResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
         if (result.IsSuccessful) {
             if (content is null && successStatusCode != HttpStatusCode.Created && successStatusCode != HttpStatusCode.Accepted) {
                 return TypedResults.NoContent();
@@ -56,20 +52,26 @@ public static class IResultExt {
     /// <param name="uri">The optional URI to include in the result.</param>
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static IResult ToResult<TSuccess>(this ITnTResult<TSuccess> result, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => result.ToResult(result.IsSuccessful ? result.Value : null, uri, successStatusCode);
+    public static IResult ToIResult<TSuccess>(this ITnTResult<TSuccess> result, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) =>
+        result.ToIResult(result.IsSuccessful ? result.Value : null, uri, successStatusCode);
 
-    public static IResult ToResult(this ITnTResult<Stream> result, string? contentType, string? fileDownloadName) {
-        if (result.IsSuccessful) {
-            return Results.File(result.Value!, contentType, fileDownloadName);
-        }
-        else {
-            return result.Error switch {
-                NotFoundException => Results.NotFound(result.ErrorMessage),
-                UnauthorizedAccessException => Results.Unauthorized(),
-                _ => Results.BadRequest()
-            };
-        }
-    }
+    /// <summary>
+    /// Converts an <see cref="ITnTResult{Stream}" /> to an <see cref="IResult" />.
+    /// </summary>
+    /// <param name="result">The <see cref="ITnTResult{Stream}" /> to convert.</param>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="fileDownloadName">The file download name.</param>
+    /// <returns>The converted <see cref="IResult" />.</returns>
+    public static IResult ToIResult(this ITnTResult<Stream> result, string? contentType, string? fileDownloadName) =>
+        result.IsSuccessful ? Results.File(result.Value!, contentType, fileDownloadName) : result.ToIResult();
+
+    /// <summary>
+    /// Converts an <see cref="ITnTResult{TnTFileStream}" /> to an <see cref="IResult" />.
+    /// </summary>
+    /// <param name="result">The <see cref="ITnTResult{TnTFileStream}" /> to convert.</param>
+    /// <returns>The converted <see cref="IResult" />.</returns>
+    public static IResult ToIResult(this ITnTResult<TnTFileStream> result) =>
+        result.IsSuccessful && result.Value!.Stream is not null ? Results.File(result.Value.Stream, result.Value.ContentType, result.Value.Filename) : result.ToIResult();
 
     /// <summary>
     /// Converts a <see cref="Task{ITnTResult}" /> to an <see cref="IResult" /> asynchronously.
@@ -79,7 +81,7 @@ public static class IResultExt {
     /// <param name="uri">The optional URI to include in the result.</param>
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static async Task<IResult> ToResultAsync(this Task<ITnTResult> task, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => (await task).ToResult(content, uri, successStatusCode);
+    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult> task, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => (await task).ToIResult(content, uri, successStatusCode);
 
     /// <summary>
     /// Converts a <see cref="Task{ITnTResult{TSuccess}}" /> to an <see cref="IResult" /> asynchronously.
@@ -89,8 +91,21 @@ public static class IResultExt {
     /// <param name="uri">The optional URI to include in the result.</param>
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static async Task<IResult> ToResultAsync<TSuccess>(this Task<ITnTResult<TSuccess>> task, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => (await task).ToResult(uri, successStatusCode);
+    public static async Task<IResult> ToIResultAsync<TSuccess>(this Task<ITnTResult<TSuccess>> task, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => (await task).ToIResult(uri, successStatusCode);
 
-    public static async Task<IResult> ToResultAsync(this Task<ITnTResult<Stream>> task, string? contentType, string? fileDownloadName) => (await task).ToResult(contentType, fileDownloadName);
+    /// <summary>
+    /// Converts a <see cref="Task{ITnTResult{Stream}}" /> to an <see cref="IResult" /> asynchronously.
+    /// </summary>
+    /// <param name="task">The <see cref="Task{ITnTResult{Stream}}" /> to convert.</param>
+    /// <param name="contentType">The content type of the stream.</param>
+    /// <param name="fileDownloadName">The file download name.</param>
+    /// <returns>The converted <see cref="IResult" />.</returns>
+    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult<Stream>> task, string? contentType, string? fileDownloadName) => (await task).ToIResult(contentType, fileDownloadName);
+
+    /// <summary>
+    /// Converts a <see cref="Task{ITnTResult{TnTFileStream}}" /> to an <see cref="IResult" /> asynchronously.
+    /// </summary>
+    /// <param name="task">The <see cref="Task{ITnTResult{TnTFileStream}}" /> to convert.</param>
+    /// <returns>The converted <see cref="IResult" />.</returns>
+    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult<TnTFileStream>> task) => (await task).ToIResult();
 }
-
