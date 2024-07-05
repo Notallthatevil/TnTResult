@@ -28,7 +28,7 @@ public static class IResultExt {
             }
 
             return successStatusCode switch {
-                HttpStatusCode.OK => TypedResults.Ok(content),
+                HttpStatusCode.OK => content is string str ? TypedResults.Text(str, "text/plain") : TypedResults.Ok(content),
                 HttpStatusCode.Created => TypedResults.Created(uri, content),
                 HttpStatusCode.Accepted => TypedResults.Accepted(uri, content),
                 HttpStatusCode.NoContent => TypedResults.NoContent(),
