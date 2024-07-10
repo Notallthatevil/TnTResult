@@ -52,7 +52,7 @@ public static class IApiResponseExt {
         if (apiResponse?.IsSuccessStatusCode == true) {
             return ITnTResult<TnTFileStream>.Success(new TnTFileStream {
                 Stream = apiResponse.Content,
-                Filename = apiResponse.ContentHeaders.ContentDisposition?.FileName,
+                Filename = apiResponse.ContentHeaders.ContentDisposition?.FileNameStar ?? apiResponse.ContentHeaders.ContentDisposition?.FileName,
                 ContentType = apiResponse.ContentHeaders.ContentType?.MediaType
             });
         }
