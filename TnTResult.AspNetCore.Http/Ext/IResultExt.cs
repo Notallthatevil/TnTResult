@@ -38,7 +38,7 @@ public static class IResultExt {
         else {
             return result.Error switch {
                 NotFoundException => TypedResults.NotFound(result.ErrorMessage),
-                UnauthorizedAccessException => TypedResults.Unauthorized(),
+                UnauthorizedAccessException => TypedResults.Forbid(),
                 _ => TypedResults.BadRequest()
             };
         }
