@@ -39,7 +39,7 @@ public static class IResultExt {
             return result.Error switch {
                 NotFoundException => TypedResults.NotFound(result.ErrorMessage),
                 UnauthorizedAccessException => TypedResults.Forbid(),
-                _ => TypedResults.BadRequest()
+                _ => TypedResults.BadRequest(result.ErrorMessage)
             };
         }
     }
