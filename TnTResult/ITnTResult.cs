@@ -26,6 +26,11 @@ public interface ITnTResult {
     bool IsSuccessful { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the operation was not successful.
+    /// </summary>
+    bool IsFailure => !IsSuccessful;
+
+    /// <summary>
     /// Creates a failure result with the specified exception.
     /// </summary>
     /// <param name="ex">The exception.</param>
