@@ -63,7 +63,7 @@ public static class IResultExt {
     /// <param name="fileDownloadName">The file download name.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
     public static IResult ToIResult(this ITnTResult<Stream> result, string? contentType, string? fileDownloadName) =>
-        result.IsSuccessful ? Results.File(result.Value!, contentType, fileDownloadName) : result.ToIResult();
+        result.IsSuccessful ? Results.File(result.Value!, contentType, fileDownloadName) : result.ToIResult(uri: null);
 
     /// <summary>
     /// Converts an <see cref="ITnTResult{TnTFileStream}" /> to an <see cref="IResult" />.
@@ -71,7 +71,7 @@ public static class IResultExt {
     /// <param name="result">The <see cref="ITnTResult{TnTFileStream}" /> to convert.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
     public static IResult ToIResult(this ITnTResult<TnTFileStream> result) =>
-        result.IsSuccessful && result.Value!.Stream is not null ? Results.File(result.Value.Stream, result.Value.ContentType, result.Value.Filename) : result.ToIResult();
+        result.IsSuccessful && result.Value!.Stream is not null ? Results.File(result.Value.Stream, result.Value.ContentType, result.Value.Filename) : result.ToIResult(uri: null);
 
     /// <summary>
     /// Converts a <see cref="Task{ITnTResult}" /> to an <see cref="IResult" /> asynchronously.
