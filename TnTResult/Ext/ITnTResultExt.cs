@@ -55,7 +55,7 @@ public static class ITnTResultExt {
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <returns><paramref name="tntResult"/></returns>
-    public static ITnTResult<TSuccess> OnSuccess<TSuccess>(this ITnTResult<TSuccess> tntResult, Action<TSuccess?> action) => tntResult.OnSuccessAsync((value) => {
+    public static ITnTResult<TSuccess> OnSuccess<TSuccess>(this ITnTResult<TSuccess> tntResult, Action<TSuccess> action) => tntResult.OnSuccessAsync((value) => {
         action(value);
         return Task.CompletedTask;
     }).Result;
@@ -65,7 +65,7 @@ public static class ITnTResultExt {
     /// </summary>
     /// <param name="func">The asynchronous function to execute.</param>
     /// <returns>A task representing the asynchronous operation containing the provided <paramref name="tntResult"/></returns>
-    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ITnTResult<TSuccess> tntResult, Func<TSuccess?, Task> func) {
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ITnTResult<TSuccess> tntResult, Func<TSuccess, Task> func) {
         if (tntResult.IsSuccessful) {
             await func(tntResult.Value);
         }

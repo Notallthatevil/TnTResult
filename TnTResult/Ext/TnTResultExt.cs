@@ -54,19 +54,19 @@ public static class TnTResultExt {
         return await (await result).OnSuccessAsync(func);
     }
 
-    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<TSuccess?> action) {
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<TSuccess> action) {
         return (await result).OnSuccess(action);
     }
 
-    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<TSuccess?, Task> func) {
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) {
         return await (await result).OnSuccessAsync(func);
     }
 
-    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<TSuccess?> action) {
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<TSuccess> action) {
         return (await result).OnSuccess(action);
     }
 
-    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<TSuccess?, Task> func) {
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) {
         return await (await result).OnSuccessAsync(func);
     }
 }
