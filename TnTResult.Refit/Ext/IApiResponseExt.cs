@@ -16,7 +16,12 @@ public static class IApiResponseExt {
         }
         else {
             if (!apiResponse.IsSuccessStatusCode) {
-                return ITnTResult.Failure(apiResponse.Error.Content?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}");
+                if (apiResponse.StatusCode == HttpStatusCode.InternalServerError) {
+                    return ITnTResult.Failure(apiResponse.Error.ReasonPhrase?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}");
+                }
+                else {
+                    return ITnTResult.Failure(apiResponse.Error.Content?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}");
+                }
             }
 
             return ITnTResult.Successful;
