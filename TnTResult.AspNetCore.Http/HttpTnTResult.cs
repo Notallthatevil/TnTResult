@@ -8,7 +8,7 @@ using TnTResult.AspNetCore.Http.Ext;
 using TnTResult.Ext;
 
 namespace TnTResult.AspNetCore.Http;
-public struct HttpTnTResult : ITnTResult, IResult {
+internal struct HttpTnTResult : ITnTResult, IResult {
 
     /// <inheritdoc />
     public readonly Exception Error => _error.Value;
@@ -37,7 +37,7 @@ public struct HttpTnTResult : ITnTResult, IResult {
     public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult().ExecuteAsync(httpContext);
 }
 
-public struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
+internal struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <inheritdoc />
     public readonly Exception Error => _expected.Error;
 
