@@ -44,10 +44,10 @@ public readonly struct Expected<T, ErrorType> {
     /// <exception cref="InvalidOperationException">
     /// The held type is not <typeparamref name="T" />.
     /// </exception>
-    public readonly T? Value {
+    public readonly T Value {
         get {
             if (_heldType == typeof(T)) {
-                return (T?)_value;
+                return (T)_value;
             }
             else {
                 throw new InvalidOperationException($"Attempted to access value, but the held type is {typeof(ErrorType).Name}");
@@ -56,7 +56,7 @@ public readonly struct Expected<T, ErrorType> {
     }
 
     private readonly Type _heldType;
-    private readonly object? _value;
+    private readonly object _value;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Expected{T, ErrorType}" /> class with a value
@@ -66,7 +66,7 @@ public readonly struct Expected<T, ErrorType> {
     /// <exception cref="InvalidOperationException">
     /// <typeparamref name="T" /> and <typeparamref name="ErrorType" /> cannot be inherited from one another.
     /// </exception>
-    private Expected(T? value) {
+    private Expected(T value) {
         if (!ValidateTypes()) {
             throw new InvalidOperationException($"{typeof(T).Name} and {typeof(ErrorType).Name} cannot be inherited from one another");
         }

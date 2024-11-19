@@ -58,7 +58,7 @@ public interface ITnTResult<TSuccess> : ITnTResult {
     /// <summary>
     /// Gets the success value if the operation was successful.
     /// </summary>
-    TSuccess? Value { get; }
+    TSuccess Value { get; }
 
     /// <summary>
     /// Creates a failure result with the specified exception.

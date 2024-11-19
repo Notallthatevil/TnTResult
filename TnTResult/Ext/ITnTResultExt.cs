@@ -12,10 +12,13 @@ public static class ITnTResultExt {
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <returns><paramref name="tntResult"/></returns>
-    public static ITnTResult OnFailure(this ITnTResult tntResult, Action<Exception> action) => tntResult.OnFailureAsync((exc) => {
-        action(exc);
-        return Task.CompletedTask;
-    }).Result;
+    public static ITnTResult OnFailure(this ITnTResult tntResult, Action<Exception> action) {
+        if (tntResult.HasFailed) {
+            action(tntResult.Error);
+        }
+        return tntResult;
+    }
+
     /// <summary>
     /// Asynchronously executes the specified function if the result is a failure.
     /// </summary>
@@ -27,17 +30,19 @@ public static class ITnTResultExt {
         }
         return tntResult;
     }
+
     /// <summary>
     /// Executes the specified action if the result is a success.
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <returns><paramref name="tntResult"/></returns>
     public static ITnTResult OnSuccess(this ITnTResult tntResult, Action action) {
-        return tntResult.OnSuccessAsync(() => {
+        if (tntResult.IsSuccessful) {
             action();
-            return Task.CompletedTask;
-        }).Result;
+        }
+        return tntResult;
     }
+
     /// <summary>
     /// Asynchronously executes the specified function if the result is a success.
     /// </summary>
@@ -55,10 +60,12 @@ public static class ITnTResultExt {
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <returns><paramref name="tntResult"/></returns>
-    public static ITnTResult<TSuccess> OnSuccess<TSuccess>(this ITnTResult<TSuccess> tntResult, Action<TSuccess> action) => tntResult.OnSuccessAsync((value) => {
-        action(value);
-        return Task.CompletedTask;
-    }).Result;
+    public static ITnTResult<TSuccess> OnSuccess<TSuccess>(this ITnTResult<TSuccess> tntResult, Action<TSuccess> action) {
+        if (tntResult.IsSuccessful) {
+            action(tntResult.Value);
+        }
+        return tntResult;
+    }
 
     /// <summary>
     /// Executes the specified asynchronous function if the operation was successful.
