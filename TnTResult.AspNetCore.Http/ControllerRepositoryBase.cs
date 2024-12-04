@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TnTResult.Exceptions;
@@ -9,6 +11,8 @@ using TnTResult.Exceptions;
 namespace TnTResult.AspNetCore.Http;
 [ApiController]
 public abstract class ControllerRepositoryBase : ControllerBase {
+    protected virtual string? UserId => User?.FindFirstValue(ClaimTypes.NameIdentifier);
+
     protected static ITnTResult Successful => HttpTnTResult.Successful;
     protected static ITnTResult Failure(string message) => Failure(new Exception(message));
     protected static ITnTResult Failure(Exception ex) => HttpTnTResult.Failure(ex);
@@ -18,8 +22,8 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     protected static ITnTResult<TSuccess> NotFound<EntityType, TSuccess>(object key) => HttpTnTResult<TSuccess>.Failure(new NotFoundException(typeof(EntityType), key));
     protected static ITnTResult<TSuccess> Success<TSuccess>(TSuccess value) => HttpTnTResult<TSuccess>.Success(value);
 
-    new protected static ITnTResult Unauthorized() => Failure(new UnauthorizedAccessException());
+    protected static ITnTResult FailureUnauthorized => Failure(new UnauthorizedAccessException());
     protected static ITnTResult<TSuccess> Unauthorized<TSuccess>() => Failure<TSuccess>(new UnauthorizedAccessException());
-    new protected static ITnTResult Created() => HttpTnTResult.Created;
+    protected static ITnTResult SuccessfullyCreated => HttpTnTResult.Created;
     protected static ITnTResult<TSuccess> Created<TSuccess>(TSuccess value) => HttpTnTResult<TSuccess>.Created(value);
 }
