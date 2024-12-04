@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TnTResult.AspNetCore.Http.Ext;
@@ -19,10 +20,13 @@ internal struct HttpTnTResult : ITnTResult, IResult {
     /// <inheritdoc />
     public readonly bool IsSuccessful => !_error.HasValue;
 
+    private HttpStatusCode _successStatusCode = HttpStatusCode.OK;
+
     /// <summary>
     /// Gets a successful result.
     /// </summary>
     public static HttpTnTResult Successful => new() { _error = Optional<Exception>.NullOpt };
+    public static HttpTnTResult Created => new() { _successStatusCode = HttpStatusCode.Created };
 
     private Optional<Exception> _error = new Exception().MakeOptional();
 
@@ -34,7 +38,7 @@ internal struct HttpTnTResult : ITnTResult, IResult {
     public static HttpTnTResult Failure(Exception error) => new(error);
     public static HttpTnTResult Failure(string error) => new(new(error));
 
-    public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult().ExecuteAsync(httpContext);
+    public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult(successStatusCode: _successStatusCode).ExecuteAsync(httpContext);
 }
 
 internal struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
@@ -48,7 +52,9 @@ internal struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     public readonly bool IsSuccessful => _expected.HasValue;
 
     /// <inheritdoc />
-    public readonly TSuccess? Value => _expected.Value;
+    public readonly TSuccess Value => _expected.Value;
+
+    private HttpStatusCode _successStatusCode = HttpStatusCode.OK;
 
     private readonly Expected<TSuccess, Exception> _expected;
 
@@ -64,6 +70,7 @@ internal struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     public static HttpTnTResult<TSuccess> Failure(Exception error) => new(error);
     public static HttpTnTResult<TSuccess> Failure(string error) => new(new Exception(error));
     public static HttpTnTResult<TSuccess> Success(TSuccess value) => new(value);
+    public static HttpTnTResult<TSuccess> Created(TSuccess value) => new(value) { _successStatusCode = HttpStatusCode.Created };
 
-    public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult().ExecuteAsync(httpContext);
+    public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult(successStatusCode: _successStatusCode).ExecuteAsync(httpContext);
 }

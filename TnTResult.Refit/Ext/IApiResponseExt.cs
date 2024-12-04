@@ -53,17 +53,17 @@ public static class IApiResponseExt {
     /// </summary>
     /// <param name="apiResponse">The <see cref="IApiResponse{Stream}" /> to convert.</param>
     /// <returns>An <see cref="ITnTResult{TnTFileStream}" /> representing the conversion result.</returns>
-    public static ITnTResult<TnTFileStream> ToTnTResult(this IApiResponse<Stream> apiResponse) {
-        if (apiResponse?.IsSuccessStatusCode == true) {
-            return ITnTResult<TnTFileStream>.Success(new TnTFileStream {
-                Stream = apiResponse.Content,
-                Filename = apiResponse.ContentHeaders.ContentDisposition?.FileNameStar ?? apiResponse.ContentHeaders.ContentDisposition?.FileName,
-                ContentType = apiResponse.ContentHeaders.ContentType?.MediaType
+    public static ITnTResult<TnTFileDownload> ToTnTResult(this IApiResponse<Stream> apiResponse) {
+        if (apiResponse is not null && apiResponse.IsSuccessStatusCode == true) {
+            return ITnTResult<TnTFileDownload>.Success(new TnTFileDownload {
+                Contents = apiResponse.Content!,
+                Filename = apiResponse.ContentHeaders.ContentDisposition?.FileNameStar ?? apiResponse.ContentHeaders.ContentDisposition?.FileName!,
+                ContentType = apiResponse.ContentHeaders.ContentType?.MediaType!
             });
         }
         else {
             var result = ((IApiResponse?)apiResponse)?.ToTnTResult();
-            return ITnTResult<TnTFileStream>.Failure(result?.Error ?? new Exception("An unknown error occurred"));
+            return ITnTResult<TnTFileDownload>.Failure(result?.Error ?? new Exception("An unknown error occurred"));
         }
     }
 
@@ -97,7 +97,7 @@ public static class IApiResponseExt {
     /// A task representing the asynchronous operation that returns an <see
     /// cref="ITnTResult{TnTFileStream}" />.
     /// </returns>
-    public static async Task<ITnTResult<TnTFileStream>> ToTnTResultAsync(this Task<IApiResponse<Stream>> task) => (await task).ToTnTResult();
+    public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<IApiResponse<Stream>> task) => (await task).ToTnTResult();
 
     /// <summary>
     /// Asynchronously converts a <see cref="Task{ApiResponse{TSuccess}}" /> to an <see
@@ -120,5 +120,5 @@ public static class IApiResponseExt {
     /// A task representing the asynchronous operation that returns an <see
     /// cref="ITnTResult{TnTFileStream}" />.
     /// </returns>
-    public static async Task<ITnTResult<TnTFileStream>> ToTnTResultAsync(this Task<ApiResponse<Stream>> task) => (await task).ToTnTResult();
+    public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<ApiResponse<Stream>> task) => (await task).ToTnTResult();
 }

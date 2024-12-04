@@ -20,4 +20,6 @@ public abstract class ControllerRepositoryBase : ControllerBase {
 
     new protected static ITnTResult Unauthorized() => Failure(new UnauthorizedAccessException());
     protected static ITnTResult<TSuccess> Unauthorized<TSuccess>() => Failure<TSuccess>(new UnauthorizedAccessException());
+    new protected static ITnTResult Created() => HttpTnTResult.Created;
+    protected static ITnTResult<TSuccess> Created<TSuccess>(TSuccess value) => HttpTnTResult<TSuccess>.Created(value);
 }

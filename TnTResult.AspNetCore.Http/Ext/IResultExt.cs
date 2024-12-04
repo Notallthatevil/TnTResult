@@ -20,13 +20,6 @@ public static class IResultExt {
                 return TypedResults.NoContent();
             }
 
-            if (result is CreatedTnTResult<string> created) {
-                return TypedResults.Created(created.Value, content);
-            }
-            else if (result is CreatedTnTResult) {
-                return TypedResults.Created(uri, content);
-            }
-
             return successStatusCode switch {
                 HttpStatusCode.OK => content is string str ? TypedResults.Text(str, "text/plain") : TypedResults.Ok(content),
                 HttpStatusCode.Created => TypedResults.Created(uri, content),
@@ -70,8 +63,8 @@ public static class IResultExt {
     /// </summary>
     /// <param name="result">The <see cref="ITnTResult{TnTFileStream}" /> to convert.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static IResult ToIResult(this ITnTResult<TnTFileStream> result) =>
-        result.IsSuccessful && result.Value!.Stream is not null ? Results.File(result.Value.Stream, result.Value.ContentType, result.Value.Filename) : result.ToIResult(uri: null);
+    public static IResult ToIResult(this ITnTResult<TnTFileDownload> result) =>
+        result.IsSuccessful && result.Value!.Contents.IsStream ? Results.File(result.Value.Contents.Stream, result.Value.ContentType, result.Value.Filename) : result.ToIResult(uri: null);
 
     /// <summary>
     /// Converts a <see cref="Task{ITnTResult}" /> to an <see cref="IResult" /> asynchronously.
@@ -107,5 +100,5 @@ public static class IResultExt {
     /// </summary>
     /// <param name="task">The <see cref="Task{ITnTResult{TnTFileStream}}" /> to convert.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
-    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult<TnTFileStream>> task) => (await task).ToIResult();
+    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult<TnTFileDownload>> task) => (await task).ToIResult();
 }
