@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TnTResult;
 
@@ -17,7 +18,8 @@ public record TnTFileDownload : IDisposable {
 
     public sealed class FileContents {
         public object? Data { get; init; }
-
+        [JsonIgnore]
+        public Type? Type => Data?.GetType();
         [JsonIgnore]
         public bool IsStream => Data is Stream;
         [JsonIgnore]
@@ -25,18 +27,19 @@ public record TnTFileDownload : IDisposable {
         [JsonIgnore]
         public bool IsUrl => Data is string;
         [JsonIgnore]
-        public Stream Stream => Data as Stream ?? throw new InvalidOperationException("Data is not a stream");
+        public Stream? Stream => Data as Stream;
         [JsonIgnore]
-        public byte[] ByteArray => Data as byte[] ?? throw new InvalidOperationException("Data is not a byte array");
+        public byte[]? ByteArray => Data as byte[];
         [JsonIgnore]
-        public string Url => Data as string ?? throw new InvalidOperationException("Data is not a URL");
+        public string? Url => Data as string;
 
-        private FileContents() { }
+        [JsonConstructor]
+        internal FileContents() { }
 
-        public static implicit operator FileContents(string url) => new FileContents { Data = url };
+        public static implicit operator FileContents(string url) => new() { Data = url };
 
-        public static implicit operator FileContents(Stream data) => new FileContents { Data = data };
+        public static implicit operator FileContents(Stream data) => new() { Data = data };
 
-        public static implicit operator FileContents(byte[] data) => new FileContents { Data = data };
+        public static implicit operator FileContents(byte[] data) => new() { Data = data };
     }
 }
