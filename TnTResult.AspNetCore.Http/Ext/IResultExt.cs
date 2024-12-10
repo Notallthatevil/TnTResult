@@ -32,6 +32,7 @@ public static class IResultExt {
             return result.Error switch {
                 NotFoundException => TypedResults.NotFound(result.ErrorMessage),
                 UnauthorizedAccessException => TypedResults.Forbid(),
+                TaskCanceledException or OperationCanceledException => TypedResults.StatusCode(StatusCodes.Status408RequestTimeout),
                 _ => TypedResults.BadRequest(result.ErrorMessage)
             };
         }
