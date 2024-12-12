@@ -72,5 +72,12 @@ internal struct HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     public static HttpTnTResult<TSuccess> Success(TSuccess value) => new(value);
     public static HttpTnTResult<TSuccess> Created(TSuccess value) => new(value) { _successStatusCode = HttpStatusCode.Created };
 
-    public Task ExecuteAsync(HttpContext httpContext) => this.ToIResult(successStatusCode: _successStatusCode).ExecuteAsync(httpContext);
+    public async Task ExecuteAsync(HttpContext httpContext) {
+        if (this is ITnTResult<TnTFileDownload> fileDownloadResult) {
+            await fileDownloadResult.ToIResult().ExecuteAsync(httpContext);
+        }
+        else {
+            await this.ToIResult(successStatusCode: _successStatusCode).ExecuteAsync(httpContext);
+        }
+    }
 }
