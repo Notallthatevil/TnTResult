@@ -14,7 +14,7 @@ public static class IApiResponseExt {
     /// </summary>
     /// <param name="apiResponse">The API response.</param>
     /// <returns>The result of the operation.</returns>
-    public static ITnTResult ToTnTResult(this IApiResponse apiResponse) => new PromotingApiResponse(apiResponse).ToTnTResult<object>();
+    public static ITnTResult ToTnTResult(this IApiResponse apiResponse) => new PromotingApiResponse(apiResponse).ToTnTResult();
 
     /// <summary>
     ///     Converts an IApiResponse of type TSuccess to an ITnTResult of type TSuccess.
@@ -81,8 +81,8 @@ public static class IApiResponseExt {
     ///     Internal implementation of IApiResponse for object type.
     /// </summary>
     /// <param name="apiResponse">The original API response.</param>
-    private class PromotingApiResponse(IApiResponse apiResponse) : IApiResponse<object> {
-        public object? Content => null;
+    private class PromotingApiResponse(IApiResponse apiResponse) : IApiResponse<int> {
+        public int Content => 0;
         public HttpContentHeaders? ContentHeaders => apiResponse.ContentHeaders;
         public ApiException? Error => apiResponse.Error;
         public HttpResponseHeaders Headers => apiResponse.Headers;
