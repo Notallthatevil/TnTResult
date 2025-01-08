@@ -7,29 +7,46 @@ using System.Threading.Tasks;
 namespace TnTResult;
 
 /// <summary>
-/// Represents an optional value that may or may not have a value.
+///     Provides static methods for creating optional values.
+/// </summary>
+public static class Optional {
+
+    /// <summary>
+    ///     Creates an instance of <see cref="Optional{OptType}" /> with the specified value.
+    /// </summary>
+    /// <typeparam name="OptType">The type of the optional value.</typeparam>
+    /// <param name="optional">The value of the optional.</param>
+    /// <returns>An instance of <see cref="Optional{OptType}" />.</returns>
+    public static Optional<OptType> MakeOptional<OptType>(OptType optional) => Optional<OptType>.MakeOptional(optional);
+}
+
+/// <summary>
+///     Represents an optional value that may or may not have a value.
 /// </summary>
 /// <typeparam name="OptType">The type of the optional value.</typeparam>
 public readonly struct Optional<OptType> {
+
     /// <summary>
-    /// Gets an instance of <see cref="Optional{OptType}"/> that represents an empty optional.
+    ///     Gets an instance of <see cref="Optional{OptType}" /> that represents an empty optional.
     /// </summary>
     public static Optional<OptType> NullOpt => new();
 
     /// <summary>
-    /// Gets a value indicating whether this optional has a value.
+    ///     Gets a value indicating whether this optional has a value.
     /// </summary>
     public readonly bool HasValue => _value is not null;
 
     /// <summary>
-    /// Gets the value of the optional. Throws an <see cref="InvalidOperationException"/> if the optional is empty.
+    ///     Gets the value of the optional. Throws an <see cref="InvalidOperationException" /> if
+    ///     the optional is empty.
     /// </summary>
     public readonly OptType Value => _value ?? throw new InvalidOperationException("Attempted to obtain the value of an optional, but this optional is empty");
 
     private readonly OptType? _value;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Optional{OptType}"/> struct with the specified value.
+    ///     Initializes a new instance of the <see cref="Optional{OptType}" /> struct with the
+    ///     specified value.
     /// </summary>
     /// <param name="value">The value of the optional.</param>
     private Optional(OptType value) {
@@ -38,17 +55,17 @@ public readonly struct Optional<OptType> {
     }
 
     /// <summary>
-    /// Creates an instance of <see cref="Optional{OptType}"/> with the specified value.
+    ///     Creates an instance of <see cref="Optional{OptType}" /> with the specified value.
     /// </summary>
     /// <param name="optional">The value of the optional.</param>
-    /// <returns>An instance of <see cref="Optional{OptType}"/>.</returns>
+    /// <returns>An instance of <see cref="Optional{OptType}" />.</returns>
     public static Optional<OptType> MakeOptional(OptType optional) => new(optional);
 
     /// <summary>
-    /// Performs an action on the value of the optional if it has a value.
+    ///     Performs an action on the value of the optional if it has a value.
     /// </summary>
     /// <param name="action">The action to perform on the value.</param>
-    /// <returns>The current instance of <see cref="Optional{OptType}"/>.</returns>
+    /// <returns>The current instance of <see cref="Optional{OptType}" />.</returns>
     public Optional<OptType> AndThen(Action<OptType> action) {
         if (HasValue) {
             action(Value);
@@ -57,10 +74,10 @@ public readonly struct Optional<OptType> {
     }
 
     /// <summary>
-    /// Performs an action if the optional does not have a value.
+    ///     Performs an action if the optional does not have a value.
     /// </summary>
     /// <param name="action">The action to perform.</param>
-    /// <returns>The current instance of <see cref="Optional{OptType}"/>.</returns>
+    /// <returns>The current instance of <see cref="Optional{OptType}" />.</returns>
     public Optional<OptType> OrElse(Action action) {
         if (!HasValue) {
             action();
@@ -69,11 +86,14 @@ public readonly struct Optional<OptType> {
     }
 
     /// <summary>
-    /// Transforms the value of the optional using the specified function.
+    ///     Transforms the value of the optional using the specified function.
     /// </summary>
     /// <typeparam name="NewOptType">The type of the transformed optional value.</typeparam>
     /// <param name="func">The function to transform the value.</param>
-    /// <returns>An instance of <see cref="Optional{NewOptType}"/> with the transformed value, or an empty optional if the transformation result is null.</returns>
+    /// <returns>
+    ///     An instance of <see cref="Optional{NewOptType}" /> with the transformed value, or an
+    ///     empty optional if the transformation result is null.
+    /// </returns>
     public Optional<NewOptType> Transform<NewOptType>(Func<OptType, NewOptType?> func) {
         if (HasValue) {
             var newValue = func(Value);
@@ -85,7 +105,7 @@ public readonly struct Optional<OptType> {
     }
 
     /// <summary>
-    /// Gets the value of the optional, or a default value if the optional is empty.
+    ///     Gets the value of the optional, or a default value if the optional is empty.
     /// </summary>
     /// <param name="defaultValue">The default value to return if the optional is empty.</param>
     /// <returns>The value of the optional, or the default value if the optional is empty.</returns>
@@ -93,4 +113,6 @@ public readonly struct Optional<OptType> {
         ArgumentNullException.ThrowIfNull(defaultValue, nameof(defaultValue));
         return HasValue ? Value : defaultValue;
     }
+
+    public static implicit operator Optional<OptType>(OptType value) => value is not null ? new(value) : NullOpt;
 }

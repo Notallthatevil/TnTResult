@@ -1,89 +1,74 @@
 ﻿namespace TnTResult;
 
 /// <summary>
-/// Represents the result of an operation.
+///     Represents the result of an operation.
 /// </summary>
 public interface ITnTResult {
 
     /// <summary>
-    /// Creates a successful result.
-    /// </summary>
-    static ITnTResult Successful => TnTResult.Successful;
-
-    /// <summary>
-    /// Gets the exception if the operation was not successful.
+    ///     Gets the exception if the operation was not successful.
     /// </summary>
     Exception Error { get; }
 
     /// <summary>
-    /// Gets the error message if the operation was not successful.
+    ///     Gets the error message if the operation was not successful.
     /// </summary>
     string ErrorMessage { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the operation was successful.
+    ///     Gets a value indicating whether the operation has failed.
+    /// </summary>
+    bool HasFailed { get; }
+
+    /// <summary>
+    ///     Gets a value indicating whether the operation was successful.
     /// </summary>
     bool IsSuccessful { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the operation was not successful.
+    ///     Executes the specified action if the operation has failed.
     /// </summary>
-    bool HasFailed => !IsSuccessful;
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The current result instance.</returns>
+    ITnTResult OnFailure(Action<Exception> action);
 
     /// <summary>
-    /// Creates a failure result with the specified exception.
+    ///     Executes the specified action if the operation was successful.
     /// </summary>
-    /// <param name="ex">The exception.</param>
-    /// <returns>A failure TnTResult instance.</returns>
-    static ITnTResult Failure(Exception ex) {
-        return new TnTResult(ex);
-    }
-
-    /// <summary>
-    /// Creates a failure result with the specified error message.
-    /// </summary>
-    /// <param name="message">The error message.</param>
-    /// <returns>A failure TnTResult instance.</returns>
-    static ITnTResult Failure(string message) {
-        return new TnTResult(new Exception(message));
-    }
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The current result instance.</returns>
+    ITnTResult OnSuccess(Action action);
 }
 
 /// <summary>
-/// Represents the result of an operation with a specific success value.
+///     Represents the result of an operation with a specific success value.
 /// </summary>
 /// <typeparam name="TSuccess">The type of the success value.</typeparam>
 public interface ITnTResult<TSuccess> : ITnTResult {
 
     /// <summary>
-    /// Gets the success value if the operation was successful.
+    ///     Gets the success value if the operation was successful.
     /// </summary>
     TSuccess Value { get; }
 
     /// <summary>
-    /// Creates a failure result with the specified exception.
+    ///     Executes the specified action if the operation has failed.
     /// </summary>
-    /// <param name="ex">The exception.</param>
-    /// <returns>A failure TnTResult instance.</returns>
-    static new ITnTResult<TSuccess> Failure(Exception ex) {
-        return new TnTResult<TSuccess>(ex);
-    }
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The current result instance.</returns>
+    new ITnTResult<TSuccess> OnFailure(Action<Exception> action);
 
     /// <summary>
-    /// Creates a failure result with the specified error message.
+    ///     Executes the specified action if the operation was successful.
     /// </summary>
-    /// <param name="message">The error message.</param>
-    /// <returns>A failure TnTResult instance.</returns>
-    static new ITnTResult<TSuccess> Failure(string message) {
-        return new TnTResult<TSuccess>(new Exception(message));
-    }
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The current result instance.</returns>
+    ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action);
 
     /// <summary>
-    /// Creates a success result with the specified value.
+    ///     Executes the specified action if the operation was successful.
     /// </summary>
-    /// <param name="value">The success value.</param>
-    /// <returns>A success TnTResult instance.</returns>
-    static ITnTResult<TSuccess> Success(TSuccess? value) {
-        return new TnTResult<TSuccess>(value);
-    }
+    /// <param name="action">The action to execute.</param>
+    /// <returns>The current result instance.</returns>
+    new ITnTResult<TSuccess> OnSuccess(Action action);
 }
