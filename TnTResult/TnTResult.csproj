@@ -4,9 +4,13 @@
         <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <SignAssembly>False</SignAssembly>
+        <Title>TnTResult</Title>
+        <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="TnTResult.AspNetCore.Http"/>
+        <InternalsVisibleTo Include="TnTResult.AspNetCore.Http" />
     </ItemGroup>
 </Project>
