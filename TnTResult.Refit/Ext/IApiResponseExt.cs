@@ -25,21 +25,21 @@ public static class IApiResponseExt {
     public static ITnTResult<TSuccess> ToTnTResult<TSuccess>(this IApiResponse<TSuccess> apiResponse) {
         try {
             if (apiResponse is null) {
-                return ITnTResult<TSuccess>.Failure(new Exception("Failed with empty response from the server"));
+                return TnTResult.Failure<TSuccess>(new Exception("Failed with empty response from the server"));
             }
             else {
                 if (apiResponse.IsSuccessStatusCode) {
                     if (apiResponse.StatusCode == HttpStatusCode.Created && apiResponse.Headers.Location is not null && typeof(TSuccess) == typeof(string)) {
-                        return ITnTResult<TSuccess>.Success((TSuccess)Convert.ChangeType(apiResponse.Headers.Location.ToString(), typeof(TSuccess)));
+                        return TnTResult.Success((TSuccess)Convert.ChangeType(apiResponse.Headers.Location.ToString(), typeof(TSuccess)));
                     }
                     else {
-                        return ITnTResult<TSuccess>.Success(apiResponse.Content);
+                        return TnTResult.Success(apiResponse.Content!);
                     }
                 }
                 else {
                     return apiResponse.StatusCode == HttpStatusCode.InternalServerError
-                        ? ITnTResult<TSuccess>.Failure(apiResponse.Error.ReasonPhrase?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}")
-                        : ITnTResult<TSuccess>.Failure(apiResponse.Error.Content?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}");
+                        ? TnTResult.Failure<TSuccess>(new Exception(apiResponse.Error.ReasonPhrase?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}"))
+                        : TnTResult.Failure<TSuccess>(new Exception(apiResponse.Error.Content?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}"));
                 }
             }
         }
