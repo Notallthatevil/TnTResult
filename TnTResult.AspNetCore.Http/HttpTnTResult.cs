@@ -30,7 +30,9 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <inheritdoc />
     public virtual bool IsSuccessful => !_error.HasValue;
 
-    private readonly Optional<Exception> _error = new Exception().MakeOptional();
+    public bool HasFailed => !IsSuccessful;
+
+    private readonly Optional<Exception> _error;
     private readonly IResult _result;
 
     /// <summary>
@@ -39,7 +41,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <param name="error">The error that occurred.</param>
     internal HttpTnTResult(Exception error, IResult? result = null) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
-        _error = error.MakeOptional();
+        _error = Optional.MakeOptional(error);
         _result = result ?? this.ToIResult();
     }
 
@@ -87,6 +89,8 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <param name="httpContext">The HTTP context.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public virtual Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+    public ITnTResult OnFailure(Action<Exception> action) => throw new NotImplementedException();
+    public ITnTResult OnSuccess(Action action) => throw new NotImplementedException();
 }
 
 /// <summary>
@@ -103,6 +107,8 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <inheritdoc />
     public TSuccess Value => _expected.Value;
 
+    public bool HasFailed => !IsSuccessful;
+
     private readonly Expected<TSuccess, Exception> _expected;
     private readonly IResult _result;
 
@@ -112,7 +118,7 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <param name="error">The error that occurred.</param>
     internal HttpTnTResult(Exception error, IResult? result = null) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
-        _expected = error.MakeUnexpected<TSuccess, Exception>();
+        _expected = Expected.MakeUnexpected<TSuccess, Exception>(error);
         _result = result ?? this.ToIResult();
     }
 
@@ -123,7 +129,7 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <param name="success">The success value.</param>
     /// <param name="result"> The result to wrap.</param>
     private HttpTnTResult(TSuccess success, IResult? result = null) {
-        _expected = success.MakeExpected<TSuccess, Exception>();
+        _expected = Expected.MakeExpected<TSuccess, Exception>(success);
 
         var fileDownloadResult = this as ITnTResult<TnTFileDownload>;
 
@@ -172,4 +178,25 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <param name="httpContext">The HTTP context.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+    public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
+        if (IsSuccessful) {
+            action(Value);
+        }
+        return this;
+    }
+    public ITnTResult<TSuccess> OnFailure(Action<Exception> action) {
+        if (!IsSuccessful) {
+            action(Error);
+        }
+        return this;
+    }
+    public ITnTResult<TSuccess> OnSuccess(Action action) {
+        if (IsSuccessful) {
+            action();
+        }
+        return this;
+    }
+
+    ITnTResult ITnTResult.OnFailure(Action<Exception> action) => OnFailure(action);
+    ITnTResult ITnTResult.OnSuccess(Action action) => OnSuccess(action);
 }
