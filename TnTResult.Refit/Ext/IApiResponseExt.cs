@@ -117,7 +117,6 @@ public static class IApiResponseExt {
         public HttpRequestMessage? RequestMessage => apiResponse.RequestMessage;
         public HttpStatusCode StatusCode => apiResponse.StatusCode;
         public Version Version => apiResponse.Version;
-
         public void Dispose() { }
     }
 }
