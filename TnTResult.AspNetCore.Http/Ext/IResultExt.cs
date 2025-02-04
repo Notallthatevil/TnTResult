@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Reflection.Metadata;
 using TnTResult.Exceptions;
 
 namespace TnTResult.AspNetCore.Http.Ext;
@@ -31,8 +32,9 @@ public static class IResultExt {
         else {
             return result.Error switch {
                 NotFoundException => TypedResults.NotFound(result.ErrorMessage),
-                UnauthorizedAccessException => TypedResults.Forbid(),
+                UnauthorizedAccessException => TypedResults.Unauthorized(),
                 TaskCanceledException or OperationCanceledException => TypedResults.StatusCode(StatusCodes.Status408RequestTimeout),
+                ForbiddenException => TypedResults.Forbid(),
                 _ => TypedResults.BadRequest(result.ErrorMessage)
             };
         }
