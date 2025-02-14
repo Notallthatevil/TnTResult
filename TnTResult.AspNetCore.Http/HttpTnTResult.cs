@@ -33,7 +33,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public bool HasFailed => !IsSuccessful;
 
     private readonly Optional<Exception> _error;
-    private readonly IResult _result;
+    internal protected IResult Result;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
@@ -42,7 +42,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     internal HttpTnTResult(Exception error, IResult? result = null) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _error = Optional.MakeOptional(error);
-        _result = result ?? this.ToIResult();
+        Result = result ?? this.ToIResult();
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// </summary>
     internal HttpTnTResult() {
         _error = Optional<Exception>.NullOpt;
-        _result = this.ToIResult();
+        Result = this.ToIResult();
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <param name="result">The result to wrap.</param>
     protected HttpTnTResult(IResult result) {
         ArgumentNullException.ThrowIfNull(result, nameof(result));
-        _result = result;
+        Result = result;
         _error = Optional<Exception>.NullOpt;
     }
 
@@ -68,6 +68,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public static HttpTnTResult Created<TValue>(TValue? value) => new(TypedResults.Created((string?)null, value));
 
     public static HttpTnTResult Created() => new(TypedResults.Created());
+    public static HttpTnTResult Redirect(Uri uri, bool permanent, bool preserveMethod) => new(TypedResults.Redirect(uri.AbsoluteUri, permanent, preserveMethod));
 
     /// <summary>
     ///     Creates a failure result with the specified error.
@@ -88,7 +89,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// </summary>
     /// <param name="httpContext">The HTTP context.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public virtual Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+    public virtual Task ExecuteAsync(HttpContext httpContext) => Result.ExecuteAsync(httpContext);
     public ITnTResult OnFailure(Action<Exception> action) => throw new NotImplementedException();
     public ITnTResult OnSuccess(Action action) => throw new NotImplementedException();
 }
@@ -97,29 +98,26 @@ internal class HttpTnTResult : ITnTResult, IResult {
 ///     Represents an HTTP result for TnT operations with a specific success value.
 /// </summary>
 /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
-    public Exception Error => _expected.Error;
+internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
+    public override Exception Error => _expected.Error;
 
-    public string ErrorMessage => Error.Message;
+    public override string ErrorMessage => Error.Message;
 
-    public bool IsSuccessful => _expected.HasValue;
+    public override bool IsSuccessful => _expected.HasValue;
 
     /// <inheritdoc />
     public TSuccess Value => _expected.Value;
 
-    public bool HasFailed => !IsSuccessful;
-
     private readonly Expected<TSuccess, Exception> _expected;
-    private readonly IResult _result;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
     /// </summary>
     /// <param name="error">The error that occurred.</param>
-    internal HttpTnTResult(Exception error, IResult? result = null) {
+    internal HttpTnTResult(Exception error, IResult? result = null) : base(error, result) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _expected = Expected.MakeUnexpected<TSuccess, Exception>(error);
-        _result = result ?? this.ToIResult();
+        Result = result ?? this.ToIResult();
     }
 
     /// <summary>
@@ -133,7 +131,7 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
 
         var fileDownloadResult = this as ITnTResult<TnTFileDownload>;
 
-        _result = result ?? fileDownloadResult?.ToIResult() ?? this.ToIResult();
+        Result = result ?? fileDownloadResult?.ToIResult() ?? this.ToIResult();
     }
 
     /// <summary>
@@ -152,7 +150,9 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <returns>
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the failure.
     /// </returns>
-    public static HttpTnTResult<TSuccess> Failure(Exception error, IResult? result = null) => new(error, result);
+    public static new HttpTnTResult<TSuccess> Failure(Exception error, IResult? result = null) => new(error, result);
+
+    public static HttpTnTResult<TSuccess> Redirect(TSuccess value, Uri uri, bool permanent, bool preserveMethod) => new(value, TypedResults.Redirect(uri.AbsoluteUri, permanent, preserveMethod));
 
     /// <summary>
     ///     Creates a failure result with the specified error message.
@@ -161,7 +161,7 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// <returns>
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the failure.
     /// </returns>
-    public static HttpTnTResult<TSuccess> Failure(string error, IResult? result = null) => new(new Exception(error), result);
+    public static new HttpTnTResult<TSuccess> Failure(string error, IResult? result = null) => new(new Exception(error), result);
 
     /// <summary>
     ///     Creates a success result with the specified value.
@@ -172,25 +172,19 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IResult {
     /// </returns>
     public static HttpTnTResult<TSuccess> Success(TSuccess value, IResult? result = null) => new(value);
 
-    /// <summary>
-    ///     Executes the result asynchronously.
-    /// </summary>
-    /// <param name="httpContext">The HTTP context.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
     public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
         if (IsSuccessful) {
             action(Value);
         }
         return this;
     }
-    public ITnTResult<TSuccess> OnFailure(Action<Exception> action) {
+    public new ITnTResult<TSuccess> OnFailure(Action<Exception> action) {
         if (!IsSuccessful) {
             action(Error);
         }
         return this;
     }
-    public ITnTResult<TSuccess> OnSuccess(Action action) {
+    public new ITnTResult<TSuccess> OnSuccess(Action action) {
         if (IsSuccessful) {
             action();
         }

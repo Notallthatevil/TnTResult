@@ -136,4 +136,6 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
     /// <returns>The unauthorized failure result.</returns>
     protected static ITnTResult<TSuccess> Unauthorized<TSuccess>() => Failure<TSuccess>(new UnauthorizedAccessException());
+    protected static ITnTResult Redirect(Uri uri, bool permanent = false, bool preserveMethod = false) => HttpTnTResult.Redirect(uri, permanent, preserveMethod);
+    protected static ITnTResult<TSuccess> Redirect<TSuccess>(TSuccess value, Uri uri, bool permanent = false, bool preserveMethod = false) => HttpTnTResult<TSuccess>.Redirect(value, uri, permanent, preserveMethod);
 }

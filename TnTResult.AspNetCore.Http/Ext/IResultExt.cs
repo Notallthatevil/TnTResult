@@ -16,6 +16,11 @@ public static class IResultExt {
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
     public static IResult ToIResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
+        if(result is HttpTnTResult httpTnTResult) {
+            return httpTnTResult.Result;
+        }
+
+
         if (result.IsSuccessful) {
             if (content is null && successStatusCode != HttpStatusCode.Created && successStatusCode != HttpStatusCode.Accepted) {
                 return TypedResults.NoContent();
@@ -23,6 +28,9 @@ public static class IResultExt {
 
             return successStatusCode switch {
                 HttpStatusCode.OK => content is string str ? TypedResults.Text(str, "text/plain") : TypedResults.Ok(content),
+                HttpStatusCode.Redirect => TypedResults.Redirect(uri!),
+                HttpStatusCode.TemporaryRedirect => TypedResults.Redirect(uri!, false),
+                HttpStatusCode.PermanentRedirect => TypedResults.Redirect(uri!, true),
                 HttpStatusCode.Created => TypedResults.Created(uri, content),
                 HttpStatusCode.Accepted => TypedResults.Accepted(uri, content),
                 HttpStatusCode.NoContent => TypedResults.NoContent(),
