@@ -1,9 +1,7 @@
 name: Deploy to NuGet
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -29,6 +27,11 @@ jobs:
       with:
         dotnet-version: '9.x'
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x'
+
     - name: Restore dependencies
       run: dotnet restore
 
@@ -43,3 +46,10 @@ jobs:
         dotnet pack TnTResult.Refit/TnTResult.Refit.csproj --configuration Release --output ./nupkg /p:PackageVersion=${{ steps.version_step.outputs.MajorMinorPatch }}
         dotnet pack TnTResult.AspNetCore.Http/TnTResult.AspNetCore.Http.csproj --configuration Release --output ./nupkg /p:PackageVersion=${{ steps.version_step.outputs.MajorMinorPatch }}
     - run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+        WITH_V: false
+        CUSTOM_TAG: 'v${{ steps.version_step.outputs.MajorMinorPatch }}'
