@@ -90,8 +90,18 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <param name="httpContext">The HTTP context.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public virtual Task ExecuteAsync(HttpContext httpContext) => Result.ExecuteAsync(httpContext);
-    public ITnTResult OnFailure(Action<Exception> action) => throw new NotImplementedException();
-    public ITnTResult OnSuccess(Action action) => throw new NotImplementedException();
+    public ITnTResult OnFailure(Action<Exception> action) {
+        if (!IsSuccessful) {
+            action(Error);
+        }
+        return this;
+    }
+    public ITnTResult OnSuccess(Action action) {
+        if (IsSuccessful) {
+            action();
+        }
+        return this;
+    }
 }
 
 /// <summary>
