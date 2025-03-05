@@ -180,7 +180,7 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
     /// <returns>
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the success.
     /// </returns>
-    public static HttpTnTResult<TSuccess> Success(TSuccess value, IResult? result = null) => new(value);
+    public static HttpTnTResult<TSuccess> Success(TSuccess value, IResult? result = null) => new(value, result);
 
     public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
         if (IsSuccessful) {
