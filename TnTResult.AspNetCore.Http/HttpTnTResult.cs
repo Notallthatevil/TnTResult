@@ -19,7 +19,13 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <summary>
     ///     Gets a successful result.
     /// </summary>
-    public static HttpTnTResult Successful => new();
+    public static HttpTnTResult Successful {
+        get {
+            var result = new HttpTnTResult();
+            result.Result = result.ToIResult();
+            return result;
+        }
+    }
 
     /// <inheritdoc />
     public virtual Exception Error => _error.Value;
@@ -33,7 +39,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public bool HasFailed => !IsSuccessful;
 
     private readonly Optional<Exception> _error;
-    internal protected IResult Result;
+    internal protected IResult Result = default!;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
@@ -50,7 +56,6 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// </summary>
     internal HttpTnTResult() {
         _error = Optional<Exception>.NullOpt;
-        Result = this.ToIResult();
     }
 
     /// <summary>

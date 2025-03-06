@@ -48,7 +48,7 @@ public readonly struct Expected<T, ErrorType> {
     /// <summary>
     ///     Gets a value indicating whether the result is a value.
     /// </summary>
-    public readonly bool HasValue => _heldType.IsAssignableTo(typeof(T));
+    public readonly bool HasValue => _heldType?.IsAssignableTo(typeof(T)) == true;
 
     /// <summary>
     ///     Gets the value if the result is a value.
