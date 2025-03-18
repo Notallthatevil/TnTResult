@@ -76,13 +76,13 @@ public static class IResultExt {
     public static IResult ToIResult(this ITnTResult<TnTFileDownload> result) {
         if (result.IsSuccessful) {
             if (result.Value.Contents.IsStream) {
-                return Results.File(result.Value.Contents.Stream!, result.Value.ContentType, result.Value.Filename);
+                return TypedResults.File(result.Value.Contents.Stream!, result.Value.ContentType, result.Value.Filename);
             }
             else if (result.Value.Contents.IsUrl) {
                 return result.ToIResult(result.Value.Contents.Url);
             }
             else if (result.Value.Contents.IsByteArray) {
-                return result.ToIResult(result.Value.Contents.ByteArray!, result.Value.ContentType);
+                return TypedResults.File(result.Value.Contents.ByteArray!, result.Value.ContentType, result.Value.Filename);
             }
         }
         return TnTResult.Failure(result.Error).ToIResult();
