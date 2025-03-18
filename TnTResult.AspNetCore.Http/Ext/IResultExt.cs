@@ -84,6 +84,9 @@ public static class IResultExt {
             else if (result.Value.Contents.IsByteArray) {
                 return TypedResults.File(result.Value.Contents.ByteArray!, result.Value.ContentType, result.Value.Filename);
             }
+            else if(result.Value?.Contents is null){
+                return TypedResults.NoContent();
+            }
         }
         return TnTResult.Failure(result.Error).ToIResult();
     }
