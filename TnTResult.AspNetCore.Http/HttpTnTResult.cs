@@ -73,6 +73,11 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public static HttpTnTResult Created<TValue>(TValue? value) => new(TypedResults.Created((string?)null, value));
 
     public static HttpTnTResult Created() => new(TypedResults.Created());
+
+    public static HttpTnTResult CustomError(Exception exception, IResult result) => new(exception, result);
+
+    public static HttpTnTResult CustomResult(IResult result) => new(result);
+    
     public static HttpTnTResult Redirect(Uri uri, bool permanent, bool preserveMethod) => new(TypedResults.Redirect(uri.AbsoluteUri, permanent, preserveMethod));
 
     /// <summary>
@@ -157,6 +162,10 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the creation.
     /// </returns>
     public static HttpTnTResult<TSuccess> Created(TSuccess value) => new(value, TypedResults.Created((string?)null, value));
+
+    public new static HttpTnTResult<TSuccess> CustomError(Exception exception, IResult result) => new(exception, result);
+
+    public static HttpTnTResult<TSuccess> CustomResult(TSuccess success, IResult result) => new(success, result);
 
     /// <summary>
     ///     Creates a failure result with the specified error.

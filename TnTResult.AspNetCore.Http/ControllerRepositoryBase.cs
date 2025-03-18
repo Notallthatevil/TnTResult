@@ -68,6 +68,39 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     /// <param name="value">The success value.</param>
     /// <returns>The created result.</returns>
     protected static ITnTResult<TSuccess> Created<TSuccess>(TSuccess value) => HttpTnTResult<TSuccess>.Created(value);
+    
+    /// <summary>
+    ///     Creates a custom error result with the specified exception and result.
+    /// </summary>
+    /// <param name="exception">The exception that caused the error.</param>
+    /// <param name="result">The result to return.</param>
+    /// <returns>The custom error result.</returns>
+    protected static ITnTResult CustomError(Exception exception, IResult result) => HttpTnTResult.CustomError(exception, result);
+
+    /// <summary>
+    ///     Creates a custom error result with the specified exception, result, and success type.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="exception">The exception that caused the error.</param>
+    /// <param name="result">The result to return.</param>
+    /// <returns>The custom error result.</returns>
+    protected static ITnTResult<TSuccess> CustomError<TSuccess>(Exception exception, IResult result) => HttpTnTResult<TSuccess>.CustomError(exception, result);
+
+    /// <summary>
+    ///     Creates a custom result with the specified result.
+    /// </summary>
+    /// <param name="result">The result to return.</param>
+    /// <returns>The custom result.</returns>
+    protected static ITnTResult CustomResult(IResult result) => HttpTnTResult.CustomResult(result);
+
+    /// <summary>
+    ///     Creates a custom result with the specified value and result.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="value">The success value.</param>
+    /// <param name="result">The result to return.</param>
+    /// <returns>The custom result.</returns>
+    protected static ITnTResult<TSuccess> CustomResult<TSuccess>(TSuccess value, IResult result) => HttpTnTResult<TSuccess>.CustomResult(value, result);
 
     /// <summary>
     ///     Creates a failure result with the specified message.
