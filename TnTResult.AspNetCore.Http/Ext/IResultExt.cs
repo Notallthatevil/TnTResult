@@ -16,7 +16,7 @@ public static class IResultExt {
     /// <param name="successStatusCode">The success status code to use in the result.</param>
     /// <returns>The converted <see cref="IResult" />.</returns>
     public static IResult ToIResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
-        if(result is HttpTnTResult httpTnTResult && httpTnTResult.Result is not null) {
+        if(result is IHttpTnTResult httpTnTResult && httpTnTResult.Result is not null) {
             return httpTnTResult.Result;
         }
 

@@ -11,10 +11,14 @@ using TnTResult.Ext;
 
 namespace TnTResult.AspNetCore.Http;
 
+internal interface IHttpTnTResult : IResult {
+    IResult Result { get; }
+}
+
 /// <summary>
 ///     Represents an HTTP result for TnT operations.
 /// </summary>
-internal class HttpTnTResult : ITnTResult, IResult {
+internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
 
     /// <summary>
     ///     Gets a successful result.
@@ -39,7 +43,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public bool HasFailed => !IsSuccessful;
 
     private readonly Optional<Exception> _error;
-    internal protected IResult Result = default!;
+    public IResult Result { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
@@ -56,6 +60,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// </summary>
     internal HttpTnTResult() {
         _error = Optional<Exception>.NullOpt;
+        Result = this.ToIResult();
     }
 
     /// <summary>
@@ -64,8 +69,8 @@ internal class HttpTnTResult : ITnTResult, IResult {
     /// <param name="result">The result to wrap.</param>
     protected HttpTnTResult(IResult result) {
         ArgumentNullException.ThrowIfNull(result, nameof(result));
-        Result = result;
         _error = Optional<Exception>.NullOpt;
+        Result = result;
     }
 
     public static HttpTnTResult Accepted() => new(TypedResults.Accepted((string?)null));
@@ -77,7 +82,7 @@ internal class HttpTnTResult : ITnTResult, IResult {
     public static HttpTnTResult CustomError(Exception exception, IResult result) => new(exception, result);
 
     public static HttpTnTResult CustomResult(IResult result) => new(result);
-    
+
     public static HttpTnTResult Redirect(Uri uri, bool permanent, bool preserveMethod) => new(TypedResults.Redirect(uri.AbsoluteUri, permanent, preserveMethod));
 
     /// <summary>
@@ -118,23 +123,27 @@ internal class HttpTnTResult : ITnTResult, IResult {
 ///     Represents an HTTP result for TnT operations with a specific success value.
 /// </summary>
 /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
-    public override Exception Error => _expected.Error;
+internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
+    public Exception Error => _expected.Error;
 
-    public override string ErrorMessage => Error.Message;
+    public string ErrorMessage => Error.Message;
 
-    public override bool IsSuccessful => _expected.HasValue;
+    public bool IsSuccessful => _expected.HasValue;
 
     /// <inheritdoc />
     public TSuccess Value => _expected.Value;
 
+    public bool HasFailed => !IsSuccessful;
+
     private readonly Expected<TSuccess, Exception> _expected;
+
+    public IResult Result { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
     /// </summary>
     /// <param name="error">The error that occurred.</param>
-    internal HttpTnTResult(Exception error, IResult? result = null) : base(error, result) {
+    internal HttpTnTResult(Exception error, IResult? result = null) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _expected = Expected.MakeUnexpected<TSuccess, Exception>(error);
         Result = result ?? this.ToIResult();
@@ -163,7 +172,7 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
     /// </returns>
     public static HttpTnTResult<TSuccess> Created(TSuccess value) => new(value, TypedResults.Created((string?)null, value));
 
-    public new static HttpTnTResult<TSuccess> CustomError(Exception exception, IResult result) => new(exception, result);
+    public static HttpTnTResult<TSuccess> CustomError(Exception exception, IResult result) => new(exception, result);
 
     public static HttpTnTResult<TSuccess> CustomResult(TSuccess success, IResult result) => new(success, result);
 
@@ -174,7 +183,7 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
     /// <returns>
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the failure.
     /// </returns>
-    public static new HttpTnTResult<TSuccess> Failure(Exception error, IResult? result = null) => new(error, result);
+    public static HttpTnTResult<TSuccess> Failure(Exception error, IResult? result = null) => new(error, result);
 
     public static HttpTnTResult<TSuccess> Redirect(TSuccess value, Uri uri, bool permanent, bool preserveMethod) => new(value, TypedResults.Redirect(uri.AbsoluteUri, permanent, preserveMethod));
 
@@ -185,7 +194,7 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
     /// <returns>
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the failure.
     /// </returns>
-    public static new HttpTnTResult<TSuccess> Failure(string error, IResult? result = null) => new(new Exception(error), result);
+    public static HttpTnTResult<TSuccess> Failure(string error, IResult? result = null) => new(new Exception(error), result);
 
     /// <summary>
     ///     Creates a success result with the specified value.
@@ -202,13 +211,13 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
         }
         return this;
     }
-    public new ITnTResult<TSuccess> OnFailure(Action<Exception> action) {
+    public ITnTResult<TSuccess> OnFailure(Action<Exception> action) {
         if (!IsSuccessful) {
             action(Error);
         }
         return this;
     }
-    public new ITnTResult<TSuccess> OnSuccess(Action action) {
+    public ITnTResult<TSuccess> OnSuccess(Action action) {
         if (IsSuccessful) {
             action();
         }
@@ -217,4 +226,5 @@ internal class HttpTnTResult<TSuccess> : HttpTnTResult, ITnTResult<TSuccess> {
 
     ITnTResult ITnTResult.OnFailure(Action<Exception> action) => OnFailure(action);
     ITnTResult ITnTResult.OnSuccess(Action action) => OnSuccess(action);
+    public Task ExecuteAsync(HttpContext httpContext) => Result.ExecuteAsync(httpContext);
 }
