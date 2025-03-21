@@ -60,7 +60,14 @@ public static class IApiResponseExt {
     /// </summary>
     /// <param name="task">The task representing the API response.</param>
     /// <returns>A task representing the result of the operation.</returns>
-    public static async Task<ITnTResult> ToTnTResultAsync(this Task<IApiResponse> task) => await task.ContinueWith(t => t.Result.ToTnTResult());
+    public static async Task<ITnTResult> ToTnTResultAsync(this Task<IApiResponse> task) => await task.ContinueWith(t => {
+        if (t.IsCanceled || t.Result.StatusCode == HttpStatusCode.RequestTimeout) {
+            return TnTResult.Failure(new TaskCanceledException("The operation was cancelled"));
+        }
+        else {
+            return t.Result.ToTnTResult();
+        }
+    }, TaskContinuationOptions.None);
 
     /// <summary>
     ///     Asynchronously converts a Task of IApiResponse of type TSuccess to an ITnTResult of type TSuccess.
@@ -68,14 +75,28 @@ public static class IApiResponseExt {
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
     /// <param name="task">The task representing the API response.</param>
     /// <returns>A task representing the result of the operation.</returns>
-    public static async Task<ITnTResult<TSuccess>> ToTnTResultAsync<TSuccess>(this Task<IApiResponse<TSuccess>> task) => await task.ContinueWith(t => t.Result.ToTnTResult());
+    public static async Task<ITnTResult<TSuccess>> ToTnTResultAsync<TSuccess>(this Task<IApiResponse<TSuccess>> task) => await task.ContinueWith(t => {
+        if (t.IsCanceled || t.Result.StatusCode == HttpStatusCode.RequestTimeout) {
+            return TnTResult.Failure<TSuccess>(new TaskCanceledException("The operation was cancelled"));
+        }
+        else {
+            return t.Result.ToTnTResult();
+        }
+    }, TaskContinuationOptions.None);
 
-    /// <summary>
-    ///     Asynchronously converts a Task of IApiResponse of type Stream to an ITnTResult of type TnTFileDownload.
-    /// </summary>
-    /// <param name="task">The task representing the API response.</param>
-    /// <returns>A task representing the result of the operation.</returns>
-    public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<IApiResponse<Stream>> task) => await task.ContinueWith(t => t.Result.ToTnTResult());
+/// <summary>
+///     Asynchronously converts a Task of IApiResponse of type Stream to an ITnTResult of type TnTFileDownload.
+/// </summary>
+/// <param name="task">The task representing the API response.</param>
+/// <returns>A task representing the result of the operation.</returns>
+public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<IApiResponse<Stream>> task) => await task.ContinueWith(t => {
+        if (t.IsCanceled || t.Result.StatusCode == HttpStatusCode.RequestTimeout) {
+            return TnTResult.Failure<TnTFileDownload>(new TaskCanceledException("The operation was cancelled"));
+        }
+        else {
+            return t.Result.ToTnTResult();
+        }
+    }, TaskContinuationOptions.None);
 
     /// <summary>
     ///     Internal implementation of IApiResponse for object type.
