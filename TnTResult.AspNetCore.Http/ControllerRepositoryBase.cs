@@ -41,6 +41,8 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     /// </summary>
     protected static ITnTResult SuccessfullyCreated => HttpTnTResult.Created();
 
+    protected static ITnTResult FailureInternalServerError => HttpTnTResult.InternalServerError();
+
     /// <summary>
     ///     Gets the user ID from the current claims principal.
     /// </summary>
@@ -190,4 +192,11 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
     /// <returns>The unauthorized failure result.</returns>
     protected static ITnTResult<TSuccess> Unauthorized<TSuccess>() => Failure<TSuccess>(new UnauthorizedAccessException());
+#if NET9_0_OR_GREATER
+    protected static ITnTResult<TSuccess> InternalServerError<TSuccess>(string? message = null) => HttpTnTResult<TSuccess>.InternalServerError(message);
+
+    protected static ITnTResult<TSuccess> InternalServerError<TSuccess>(ProblemDetails? problemDetails) => HttpTnTResult<TSuccess>.InternalServerError(problemDetails);
+#else
+    protected static ITnTResult<TSuccess> InternalServerError<TSuccess>() => HttpTnTResult<TSuccess>.InternalServerError();
+#endif
 }

@@ -102,12 +102,9 @@ internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
 
 #if NET9_0_OR_GREATER
     public static HttpTnTResult InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
+    public static HttpTnTResult InternalServerError(ProblemDetails? problemDetails) => new(TypedResults.InternalServerError(problemDetails));
 #else
     public static HttpTnTResult InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
-#endif
-
-#if NET9_0_OR_GREATER
-    public static HttpTnTResult InternalServerError(ProblemDetails? problemDetails) => new(TypedResults.InternalServerError(problemDetails));
 #endif
 
     /// <summary>
@@ -218,12 +215,9 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
 
 #if NET9_0_OR_GREATER
     public static HttpTnTResult<TSuccess> InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
+    public static HttpTnTResult<TSuccess> InternalServerError(ProblemDetails? problemDetails) => new(null!, TypedResults.InternalServerError(problemDetails));
 #else
     public static HttpTnTResult<TSuccess> InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
-#endif
-
-#if NET9_0_OR_GREATER
-    public static HttpTnTResult<TSuccess> InternalServerError(ProblemDetails? problemDetails) => new(null!, TypedResults.InternalServerError(problemDetails));
 #endif
 
     public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
