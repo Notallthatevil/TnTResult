@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,6 +99,16 @@ internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
     /// <param name="error">The error message.</param>
     /// <returns>A new instance of <see cref="HttpTnTResult" /> representing the failure.</returns>
     public static HttpTnTResult Failure(string error, IResult? result = null) => new(new Exception(error), result);
+
+#if NET9_0_OR_GREATER
+    public static HttpTnTResult InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
+#else
+    public static HttpTnTResult InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
+#endif
+
+#if NET9_0_OR_GREATER
+    public static HttpTnTResult InternalServerError(ProblemDetails? problemDetails) => new(TypedResults.InternalServerError(problemDetails));
+#endif
 
     /// <summary>
     ///     Executes the result asynchronously.
@@ -204,6 +215,16 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
     ///     A new instance of <see cref="HttpTnTResult{TSuccess}" /> representing the success.
     /// </returns>
     public static HttpTnTResult<TSuccess> Success(TSuccess value, IResult? result = null) => new(value, result);
+
+#if NET9_0_OR_GREATER
+    public static HttpTnTResult<TSuccess> InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
+#else
+    public static HttpTnTResult<TSuccess> InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
+#endif
+
+#if NET9_0_OR_GREATER
+    public static HttpTnTResult<TSuccess> InternalServerError(ProblemDetails? problemDetails) => new(null!, TypedResults.InternalServerError(problemDetails));
+#endif
 
     public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
         if (IsSuccessful) {
