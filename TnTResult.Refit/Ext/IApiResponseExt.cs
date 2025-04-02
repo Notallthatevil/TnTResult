@@ -1,6 +1,7 @@
 ﻿using Refit;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace TnTResult.Refit.Ext;
 
@@ -37,6 +38,15 @@ public static class IApiResponseExt {
                     }
                 }
                 else {
+                    if(apiResponse.ContentHeaders?.ContentType?.ToString().Equals("application/problem+json", StringComparison.OrdinalIgnoreCase) == true && apiResponse.Error.Content is not null) {
+                        var awaitable = apiResponse.Error.GetContentAsAsync<ProblemDetails>();
+                        awaitable.Wait();
+                        var problemDetails = awaitable.Result;
+                        if(problemDetails is not null) {
+                            return TnTResult.Failure<TSuccess>(new Exception(problemDetails.Detail ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}"));
+                        }
+                    }
+
                     return apiResponse.StatusCode == HttpStatusCode.InternalServerError
                         ? TnTResult.Failure<TSuccess>(new Exception(apiResponse.Error.ReasonPhrase?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}"))
                         : TnTResult.Failure<TSuccess>(new Exception(apiResponse.Error.Content?.Trim('"') ?? $"Failed with status code {apiResponse.StatusCode} {apiResponse.ReasonPhrase}"));
