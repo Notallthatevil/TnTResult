@@ -101,10 +101,10 @@ internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
     public static HttpTnTResult Failure(string error, IResult? result = null) => new(new Exception(error), result);
 
 #if NET9_0_OR_GREATER
-    public static HttpTnTResult InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
+    public static HttpTnTResult InternalServerError(string? message = null) => new(new Exception(message), TypedResults.InternalServerError(message));
     public static HttpTnTResult InternalServerError(ProblemDetails? problemDetails) => new(TypedResults.InternalServerError(problemDetails));
 #else
-    public static HttpTnTResult InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
+    public static HttpTnTResult InternalServerError() => new(new Exception(), TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
 #endif
 
     /// <summary>
@@ -214,10 +214,10 @@ internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
     public static HttpTnTResult<TSuccess> Success(TSuccess value, IResult? result = null) => new(value, result);
 
 #if NET9_0_OR_GREATER
-    public static HttpTnTResult<TSuccess> InternalServerError(string? message = null) => new(null!, TypedResults.InternalServerError(message));
-    public static HttpTnTResult<TSuccess> InternalServerError(ProblemDetails? problemDetails) => new(null!, TypedResults.InternalServerError(problemDetails));
+    public static HttpTnTResult<TSuccess> InternalServerError(string? message = null) => new(new Exception(message), TypedResults.InternalServerError(message));
+    public static HttpTnTResult<TSuccess> InternalServerError(ProblemDetails? problemDetails) => new(new Exception(problemDetails?.Title ?? "An error occurred"), TypedResults.InternalServerError(problemDetails));
 #else
-    public static HttpTnTResult<TSuccess> InternalServerError() => new(null!, TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
+    public static HttpTnTResult<TSuccess> InternalServerError() => new(new Exception(), TypedResults.StatusCode(StatusCodes.Status500InternalServerError));
 #endif
 
     public ITnTResult<TSuccess> OnSuccess(Action<TSuccess> action) {
