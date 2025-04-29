@@ -19,7 +19,7 @@ internal interface IHttpTnTResult : IResult {
 /// <summary>
 ///     Represents an HTTP result for TnT operations.
 /// </summary>
-internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
+public class HttpTnTResult : ITnTResult, IHttpTnTResult {
 
     /// <summary>
     ///     Gets a successful result.
@@ -131,7 +131,7 @@ internal class HttpTnTResult : ITnTResult, IHttpTnTResult {
 ///     Represents an HTTP result for TnT operations with a specific success value.
 /// </summary>
 /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-internal class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
+public class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResult {
     public Exception Error => _expected.Error;
 
     public string ErrorMessage => Error.Message;
