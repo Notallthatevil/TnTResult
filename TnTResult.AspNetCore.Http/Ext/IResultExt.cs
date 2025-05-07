@@ -76,6 +76,7 @@ public static class IResultExt {
     public static IResult ToIResult(this ITnTResult<TnTFileDownload> result) {
         if (result.IsSuccessful) {
             if (result.Value.Contents.IsStream) {
+                result.Value.Contents.Stream?.Seek(0, SeekOrigin.Begin);
                 return TypedResults.File(result.Value.Contents.Stream!, result.Value.ContentType, result.Value.Filename);
             }
             else if (result.Value.Contents.IsUrl) {

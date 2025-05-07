@@ -41,6 +41,9 @@ public abstract class ControllerRepositoryBase : ControllerBase {
     /// </summary>
     protected static ITnTResult SuccessfullyCreated => HttpTnTResult.Created();
 
+    /// <summary>
+    ///     Gets a result indicating an internal server error.
+    /// </summary>
     protected static ITnTResult FailureInternalServerError => HttpTnTResult.InternalServerError();
 
     /// <summary>
