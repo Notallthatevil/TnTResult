@@ -32,8 +32,7 @@ public static class Expected {
 }
 
 /// <summary>
-///     Represents a result that can either be a value of type <typeparamref name="T" /> or an error
-///     of type <typeparamref name="ErrorType" />.
+///     Represents a result that can either be a value of type <typeparamref name="T" /> or an error of type <typeparamref name="ErrorType" />.
 /// </summary>
 /// <typeparam name="T">The type of the value.</typeparam>
 /// <typeparam name="ErrorType">The type of the error.</typeparam>
@@ -43,73 +42,100 @@ public readonly struct Expected<T, ErrorType> {
     ///     Gets the error if the result is an error.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown if the result is a value.</exception>
-    public readonly ErrorType Error => !HasValue ? (ErrorType)_value! : throw new InvalidOperationException($"Attempted to access error, but the held type is {_heldType.Name}");
+    public readonly ErrorType Error => !_hasValue ? _errorValue! : throw new InvalidOperationException("Attempted to access error, but the result contains a value");
 
     /// <summary>
     ///     Gets a value indicating whether the result is a value.
     /// </summary>
-    public readonly bool HasValue => _heldType?.IsAssignableTo(typeof(T)) == true;
+    public readonly bool HasValue => _hasValue;
 
     /// <summary>
     ///     Gets the value if the result is a value.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown if the result is an error.</exception>
-    public readonly T Value => HasValue ? (T)_value! : throw new InvalidOperationException($"Attempted to access the expected value, but the held type is {_heldType.Name}");
+    public readonly T Value => _hasValue ? _value! : throw new InvalidOperationException("Attempted to access the expected value, but the result contains an error");
 
-    private readonly Type _heldType;
-    private readonly object? _value;
+    private readonly ErrorType? _errorValue;
+    private readonly bool _hasValue;
+    private readonly T? _value;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Expected{T, ErrorType}" /> struct with a value.
     /// </summary>
     /// <param name="value">The value to be held.</param>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown if <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are
-    ///     convertible from one another.
-    /// </exception>
+    /// <exception cref="InvalidOperationException">Thrown if <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are convertible from one another.</exception>
     internal Expected(T value) {
-        if (!ValidateTypes()) {
-            throw new InvalidOperationException($"{typeof(T).Name} and {typeof(ErrorType).Name} cannot be convertible from one another");
-        }
-        _heldType = typeof(T);
+        ValidateTypesThrow();
+        _hasValue = true;
         _value = value;
+        _errorValue = default;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Expected{T, ErrorType}" /> struct with an error.
     /// </summary>
     /// <param name="error">The error to be held.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown if <paramref name="error" /> is null.
-    /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown if <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are inherited
-    ///     from one another.
-    /// </exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="error" /> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are inherited from one another.</exception>
     internal Expected(ErrorType error) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
-        if (!ValidateTypes()) {
-            throw new InvalidOperationException($"{typeof(T).Name} and {typeof(ErrorType).Name} cannot be inherited from one another");
-        }
-        _heldType = typeof(ErrorType);
-        _value = error;
+        ValidateTypesThrow();
+        _hasValue = false;
+        _value = default;
+        _errorValue = error;
     }
+
+    public static implicit operator Expected<T, ErrorType>(T value) => Expected.MakeExpected<T, ErrorType>(value);
+
+    public static implicit operator Expected<T, ErrorType>(ErrorType value) => Expected.MakeUnexpected<T, ErrorType>(value);
+
+    /// <summary>
+    ///     Determines whether two Expected instances are not equal.
+    /// </summary>
+    public static bool operator !=(Expected<T, ErrorType> left, Expected<T, ErrorType> right) => !left.Equals(right);
+
+    /// <summary>
+    ///     Determines whether two Expected instances are equal.
+    /// </summary>
+    public static bool operator ==(Expected<T, ErrorType> left, Expected<T, ErrorType> right) => left.Equals(right);
 
     /// <summary>
     ///     Applies a function to the value if the result is a value, otherwise returns the current error.
     /// </summary>
     /// <typeparam name="OutT">The type of the result of the function.</typeparam>
     /// <param name="func">The function to apply to the value.</param>
-    /// <returns>
-    ///     A new <see cref="Expected{OutT, ErrorType}" /> with the result of the function or the
-    ///     current error.
-    /// </returns>
+    /// <returns>A new <see cref="Expected{OutT, ErrorType}" /> with the result of the function or the current error.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Expected<OutT, ErrorType> AndThen<OutT>(Func<T, OutT> func) {
-        if (HasValue) {
-            var result = func(Value);
-            return Expected.MakeExpected<OutT, ErrorType>(result);
-        }
-        return Expected.MakeUnexpected<OutT, ErrorType>(Error);
+        return _hasValue
+            ? Expected.MakeExpected<OutT, ErrorType>(func(_value!))
+            : Expected.MakeUnexpected<OutT, ErrorType>(_errorValue!);
+    }
+
+    /// <summary>
+    ///     Determines whether two Expected instances are equal.
+    /// </summary>
+    public bool Equals(Expected<T, ErrorType> other) {
+        if (_hasValue != other._hasValue)
+            return false;
+
+        return _hasValue
+            ? EqualityComparer<T>.Default.Equals(_value, other._value)
+            : EqualityComparer<ErrorType>.Default.Equals(_errorValue, other._errorValue);
+    }
+
+    /// <summary>
+    ///     Determines whether this instance and a specified object are equal.
+    /// </summary>
+    public override bool Equals(object? obj) => obj is Expected<T, ErrorType> other && Equals(other);
+
+    /// <summary>
+    ///     Returns the hash code for this instance.
+    /// </summary>
+    public override int GetHashCode() {
+        return _hasValue
+            ? HashCode.Combine(true, _value)
+            : HashCode.Combine(false, _errorValue);
     }
 
     /// <summary>
@@ -117,50 +143,47 @@ public readonly struct Expected<T, ErrorType> {
     /// </summary>
     /// <typeparam name="OutErrorType">The type of the result of the function.</typeparam>
     /// <param name="func">The function to apply to the error.</param>
-    /// <returns>
-    ///     A new <see cref="Expected{T, OutErrorType}" /> with the result of the function or the
-    ///     current value.
-    /// </returns>
+    /// <returns>A new <see cref="Expected{T, OutErrorType}" /> with the result of the function or the current value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Expected<T, OutErrorType> OrElse<OutErrorType>(Func<ErrorType, OutErrorType> func) {
-        if (!HasValue) {
-            var result = func(Error);
-            return Expected.MakeUnexpected<T, OutErrorType>(result);
-        }
-        return Expected.MakeExpected<T, OutErrorType>(Value);
+        return !_hasValue
+            ? Expected.MakeUnexpected<T, OutErrorType>(func(_errorValue!))
+            : Expected.MakeExpected<T, OutErrorType>(_value!);
     }
 
     /// <summary>
-    ///     Transforms the value using a function if the result is a value, otherwise returns the
-    ///     current error.
+    ///     Returns a string representation of this instance.
     /// </summary>
-    /// <typeparam name="U">The type of the result of the function.</typeparam>
+    public override string ToString() {
+        return _hasValue
+            ? $"Expected[Value: {_value}]"
+            : $"Expected[Error: {_errorValue}]";
+    }
+
+    /// <summary>
+    ///     Transforms the value using a function if the result is a value, otherwise returns the current error.
+    /// </summary>
+    /// <typeparam name="OutT">The type of the result of the function.</typeparam>
     /// <param name="func">The function to transform the value.</param>
-    /// <returns>
-    ///     A new <see cref="Expected{U, ErrorType}" /> with the transformed value or the current error.
-    /// </returns>
+    /// <returns>A new <see cref="Expected{OutT, ErrorType}" /> with the transformed value or the current error.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Expected<OutT, ErrorType> Transform<OutT>(Func<T, OutT> func) {
-        if (HasValue) {
-            var result = func(Value);
-            return Expected.MakeExpected<OutT, ErrorType>(result);
-        }
-        return Expected.MakeUnexpected<OutT, ErrorType>(Error);
+        return _hasValue
+            ? Expected.MakeExpected<OutT, ErrorType>(func(_value!))
+            : Expected.MakeUnexpected<OutT, ErrorType>(_errorValue!);
     }
 
     /// <summary>
-    ///     Transforms the error using a function if the result is an error, otherwise returns the
-    ///     current value.
+    ///     Transforms the error using a function if the result is an error, otherwise returns the current value.
     /// </summary>
-    /// <typeparam name="E">The type of the result of the function.</typeparam>
+    /// <typeparam name="OutErrorType">The type of the result of the function.</typeparam>
     /// <param name="func">The function to transform the error.</param>
-    /// <returns>
-    ///     A new <see cref="Expected{T, E}" /> with the transformed error or the current value.
-    /// </returns>
+    /// <returns>A new <see cref="Expected{T, OutErrorType}" /> with the transformed error or the current value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Expected<T, OutErrorType> TransformError<OutErrorType>(Func<ErrorType, OutErrorType> func) {
-        if (!HasValue) {
-            var result = func(Error);
-            return Expected.MakeUnexpected<T, OutErrorType>(result);
-        }
-        return Expected.MakeExpected<T, OutErrorType>(Value);
+        return !_hasValue
+            ? Expected.MakeUnexpected<T, OutErrorType>(func(_errorValue!))
+            : Expected.MakeExpected<T, OutErrorType>(_value!);
     }
 
     /// <summary>
@@ -168,16 +191,51 @@ public readonly struct Expected<T, ErrorType> {
     /// </summary>
     /// <param name="defaultValue">The default value to return if the result is an error.</param>
     /// <returns>The value if the result is a value, otherwise the specified default value.</returns>
-    public T ValueOr(T defaultValue) => HasValue ? Value : defaultValue;
+    public T ValueOr(T defaultValue) => _hasValue ? _value! : defaultValue;
 
     /// <summary>
-    ///     Validate that <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are not
-    ///     assignable to each other.
+    ///     Gets the value if the result is a value, otherwise returns the result of the specified function.
+    /// </summary>
+    /// <param name="defaultValueFactory">The function to call if the result is an error.</param>
+    /// <returns>The value if the result is a value, otherwise the result of the function.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ValueOr(Func<T> defaultValueFactory) => _hasValue ? _value! : defaultValueFactory();
+
+    /// <summary>
+    ///     Gets the value if the result is a value, otherwise returns the result of the specified function that takes the error.
+    /// </summary>
+    /// <param name="defaultValueFactory">The function to call with the error if the result is an error.</param>
+    /// <returns>The value if the result is a value, otherwise the result of the function.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ValueOr(Func<ErrorType, T> defaultValueFactory) => _hasValue ? _value! : defaultValueFactory(_errorValue!);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowInvalidTypesException() {
+        throw new InvalidOperationException($"{typeof(T).Name} and {typeof(ErrorType).Name} cannot be convertible from one another");
+    }
+
+    /// <summary>
+    ///     Validate that <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are not assignable to each other.
     /// </summary>
     /// <returns>True if types are not convertible to one another</returns>
-    private static bool ValidateTypes() => !(typeof(T).IsAssignableTo(typeof(ErrorType)) || typeof(ErrorType).IsAssignableTo(typeof(T)));
+    private static bool ValidateTypes() => !TypeValidationCache.AreTypesConvertible;
 
-    public static implicit operator Expected<T, ErrorType>(T value) => Expected.MakeExpected<T, ErrorType>(value);
-    public static implicit operator Expected<T, ErrorType>(ErrorType value) => Expected.MakeUnexpected<T, ErrorType>(value);
+    /// <summary>
+    ///     Validates types and throws if they are invalid.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if <typeparamref name="T" /> and <typeparamref name="ErrorType" /> are convertible from one another.</exception>
+    private static void ValidateTypesThrow() {
+        if (!ValidateTypes()) {
+            ThrowInvalidTypesException();
+        }
+    }
 
+    /// <summary>
+    ///     Cached type validation to avoid repeated reflection calls.
+    /// </summary>
+    private static class TypeValidationCache {
+
+        public static readonly bool AreTypesConvertible =
+            typeof(T).IsAssignableTo(typeof(ErrorType)) || typeof(ErrorType).IsAssignableTo(typeof(T));
+    }
 }
