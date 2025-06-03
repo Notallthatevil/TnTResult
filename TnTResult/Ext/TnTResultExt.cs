@@ -6,209 +6,264 @@
 public static class TnTResultExt {
 
     /// <summary>
-    ///     Executes the specified action if the task result indicates a failure.
+    ///     Executes the specified action if the result has failed.
     /// </summary>
-    /// <param name="result">The task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnFailureAsync(this Task<ITnTResult> result, Action<Exception> action) => result.ContinueWith(task => task.Result.OnFailure(action));
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult> OnFailureAsync(this Task<ITnTResult> result, Action<Exception> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnFailure(action);
+    }
 
     /// <summary>
-    ///     Executes the specified action if the value task result indicates a failure.
+    ///     Executes the specified action if the result has failed.
     /// </summary>
-    /// <param name="result">The value task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnFailureAsync(this ValueTask<ITnTResult> result, Action<Exception> action) => result.AsTask().OnFailureAsync(action);
-
-    /// <summary>
-    ///     Executes the specified asynchronous function if the task result indicates a failure.
-    /// </summary>
-    /// <param name="result">The task result to check for failure.</param>
-    /// <param name="func">  The asynchronous function to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnFailureAsync(this Task<ITnTResult> result, Func<Exception, Task> func) {
-        return result.ContinueWith(async task => {
-            if (task.Result.HasFailed) {
-                await func(task.Result.Error);
-            }
-            return task.Result;
-        }).Unwrap();
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult> OnFailureAsync(this ValueTask<ITnTResult> result, Action<Exception> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnFailure(action);
     }
 
     /// <summary>
-    ///     Executes the specified asynchronous function if the value task result indicates a failure.
+    ///     Executes the specified asynchronous function if the result has failed.
     /// </summary>
-    /// <param name="result">The value task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="func">  The asynchronous function to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnFailureAsync(this ValueTask<ITnTResult> result, Func<Exception, Task> func) => result.AsTask().OnFailureAsync(func);
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult> OnFailureAsync(this Task<ITnTResult> result, Func<Exception, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.HasFailed) {
+            await func(r.Error).ConfigureAwait(false);
+        }
+        return r;
+    }
 
     /// <summary>
-    ///     Executes the specified action if the task result indicates a failure.
+    ///     Executes the specified asynchronous function if the result has failed.
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on failure.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult> OnFailureAsync(this ValueTask<ITnTResult> result, Func<Exception, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.HasFailed) {
+            await func(r.Error).ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified action if the result has failed.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<Exception> action) => result.ContinueWith(task => task.Result.OnFailure(action));
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<Exception> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnFailure(action);
+    }
 
     /// <summary>
-    ///     Executes the specified action if the value task result indicates a failure.
+    ///     Executes the specified action if the result has failed.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<Exception> action) => result.AsTask().OnFailureAsync(action);
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<Exception> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnFailure(action);
+    }
 
     /// <summary>
-    ///     Executes the specified asynchronous function if the task result indicates a failure.
+    ///     Executes the specified asynchronous function if the result has failed.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="func">  The asynchronous function to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<Exception, Task> func) {
-        return result.ContinueWith(async task => {
-            if (task.Result.HasFailed) {
-                await func(task.Result.Error);
-            }
-            return task.Result;
-        }).Unwrap();
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<Exception, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.HasFailed) {
+            await func(r.Error).ConfigureAwait(false);
+        }
+        return r;
     }
 
     /// <summary>
-    ///     Executes the specified asynchronous function if the value task result indicates a failure.
+    ///     Executes the specified asynchronous function if the result has failed.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for failure.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="func">  The asynchronous function to execute on failure.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<Exception, Task> func) => result.AsTask().OnFailureAsync(func);
-
-    /// <summary>
-    ///     Executes the specified action if the task result indicates success.
-    /// </summary>
-    /// <param name="result">The task result to check for success.</param>
-    /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnSuccessAsync(this Task<ITnTResult> result, Action action) => result.ContinueWith(task => task.Result.OnSuccess(action));
-
-    /// <summary>
-    ///     Executes the specified action if the value task result indicates success.
-    /// </summary>
-    /// <param name="result">The value task result to check for success.</param>
-    /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnSuccessAsync(this ValueTask<ITnTResult> result, Action action) => result.AsTask().OnSuccessAsync(action);
-
-    /// <summary>
-    ///     Executes the specified asynchronous function if the task result indicates success.
-    /// </summary>
-    /// <param name="result">The task result to check for success.</param>
-    /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnSuccessAsync(this Task<ITnTResult> result, Func<Task> func) {
-        return result.ContinueWith(async task => {
-            if (task.Result.IsSuccessful) {
-                await func();
-            }
-            return task.Result;
-        }).Unwrap();
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnFailureAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<Exception, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.HasFailed) {
+            await func(r.Error).ConfigureAwait(false);
+        }
+        return r;
     }
 
     /// <summary>
-    ///     Executes the specified asynchronous function if the value task result indicates success.
+    ///     Executes the specified action if the result is successful.
     /// </summary>
-    /// <param name="result">The value task result to check for success.</param>
-    /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult> OnSuccessAsync(this ValueTask<ITnTResult> result, Func<Task> func) => result.AsTask().OnSuccessAsync(func);
-
-    /// <summary>
-    ///     Executes the specified action if the task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for success.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action action) => result.ContinueWith(task => task.Result.OnSuccess(action));
-
-    /// <summary>
-    ///     Executes the specified action if the value task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for success.</param>
-    /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action action) => result.AsTask().OnSuccessAsync(action);
-
-    /// <summary>
-    ///     Executes the specified asynchronous function if the task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for success.</param>
-    /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<Task> func) {
-        return result.ContinueWith(async task => {
-            if (task.Result.IsSuccessful) {
-                await func();
-            }
-            return task.Result;
-        }).Unwrap();
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult> OnSuccessAsync(this Task<ITnTResult> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
     }
 
     /// <summary>
-    ///     Executes the specified asynchronous function if the value task result indicates success.
+    ///     Executes the specified action if the result is successful.
     /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for success.</param>
-    /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<Task> func) => result.AsTask().OnSuccessAsync(func);
-
-    /// <summary>
-    ///     Executes the specified action with the success value if the task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for success.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<TSuccess> action) => result.ContinueWith(task => task.Result.OnSuccess(action));
-
-    /// <summary>
-    ///     Executes the specified action with the success value if the value task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for success.</param>
-    /// <param name="action">The action to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<TSuccess> action) => result.AsTask().OnSuccessAsync(action);
-
-    /// <summary>
-    ///     Executes the specified asynchronous function with the success value if the task result indicates success.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The task result to check for success.</param>
-    /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) {
-        return result.ContinueWith(async task => {
-            if (task.Result.IsSuccessful) {
-                await func(task.Result.Value);
-            }
-            return task.Result;
-        }).Unwrap();
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult> OnSuccessAsync(this ValueTask<ITnTResult> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
     }
 
     /// <summary>
-    ///     Executes the specified asynchronous function with the success value if the value task result indicates success.
+    ///     Executes the specified asynchronous function if the result is successful.
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult> OnSuccessAsync(this Task<ITnTResult> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func().ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function if the result is successful.
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult> OnSuccessAsync(this ValueTask<ITnTResult> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func().ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified action if the result is successful.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="result">The value task result to check for success.</param>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified action if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
     /// <param name="func">  The asynchronous function to execute on success.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) => result.AsTask().OnSuccessAsync(func);
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func().ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func().ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified action with the success value if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action<TSuccess> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified action with the success value if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action<TSuccess> action) {
+        var r = await result.ConfigureAwait(false);
+        return r.OnSuccess(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function with the success value if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async Task<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func(r.Value).ConfigureAwait(false);
+        }
+        return r;
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function with the success value if the result is successful.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute on success.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask<ITnTResult<TSuccess>> OnSuccessAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<TSuccess, Task> func) {
+        var r = await result.ConfigureAwait(false);
+        if (r.IsSuccessful) {
+            await func(r.Value).ConfigureAwait(false);
+        }
+        return r;
+    }
 }
