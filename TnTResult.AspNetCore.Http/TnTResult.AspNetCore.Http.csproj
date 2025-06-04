@@ -13,9 +13,6 @@
         <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIconUrl>https://raw.githubusercontent.com/Notallthatevil/TnTResult/main/icon.png</PackageIconUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <IncludeSource>true</IncludeSource>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1591</NoWarn>
         <PackageReadmeFile>README.md</PackageReadmeFile>
