@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace TnTResult.Exceptions;
 /// <summary>
 ///     Represents an exception that is thrown when a forbidden action is attempted.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class ForbiddenException : Exception {
 
     /// <inheritdoc />

@@ -43,4 +43,43 @@ public class ExpectedExtTests {
         var value = await Task.FromResult(exp).ValueOrAsync(99);
         value.Should().Be(99);
     }
+
+    [Fact]
+    public async Task AndThenAsync_ValueTask_TransformsValue() {
+        var exp = Expected.MakeExpected<string, bool>("abc");
+        var result = await new ValueTask<Expected<string, bool>>(exp).AndThenAsync(x => x.Length);
+        result.HasValue.Should().BeTrue();
+        result.Value.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task OrElseAsync_ValueTask_TransformsError() {
+        var exp = Expected.MakeUnexpected<bool, string>("err");
+        var result = await new ValueTask<Expected<bool, string>>(exp).OrElseAsync(e => e.Length);
+        result.HasValue.Should().BeFalse();
+        result.Error.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task TransformAsync_ValueTask_TransformsValue() {
+        var exp = Expected.MakeExpected<int, bool>(7);
+        var result = await new ValueTask<Expected<int, bool>>(exp).TransformAsync(x => x.ToString());
+        result.HasValue.Should().BeTrue();
+        result.Value.Should().Be("7");
+    }
+
+    [Fact]
+    public async Task TransformErrorAsync_ValueTask_TransformsError() {
+        var exp = Expected.MakeUnexpected<bool, string>("fail");
+        var result = await new ValueTask<Expected<bool, string>>(exp).TransformErrorAsync(e => e.Length);
+        result.HasValue.Should().BeFalse();
+        result.Error.Should().Be(4);
+    }
+
+    [Fact]
+    public async Task ValueOrAsync_ValueTask_ReturnsValueOrDefault() {
+        var exp = Expected.MakeUnexpected<int, string>("fail");
+        var value = await new ValueTask<Expected<int, string>>(exp).ValueOrAsync(99);
+        value.Should().Be(99);
+    }
 }

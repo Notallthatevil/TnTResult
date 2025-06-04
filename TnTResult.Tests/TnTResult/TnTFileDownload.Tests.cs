@@ -47,4 +47,90 @@ public class TnTFileDownloadTests {
         file.Dispose();
         ((Action)(() => ms.ReadByte())).Should().Throw<ObjectDisposedException>();
     }
+
+        [Fact]
+    public void FileContents_DataProperty_And_TypeProperty_WorkForAllTypes() {
+        var stream = new System.IO.MemoryStream();
+        TnTFileDownload.FileContents fcStream = stream;
+        fcStream.Data.Should().BeSameAs(stream);
+        fcStream.Type.Should().Be(typeof(System.IO.MemoryStream));
+        fcStream.IsStream.Should().BeTrue();
+        fcStream.IsByteArray.Should().BeFalse();
+        fcStream.IsUrl.Should().BeFalse();
+        fcStream.Stream.Should().BeSameAs(stream);
+        fcStream.ByteArray.Should().BeNull();
+        fcStream.Url.Should().BeNull();
+        fcStream.Dispose();
+
+        byte[] arr = { 4, 5 };
+        TnTFileDownload.FileContents fcBytes = arr;
+        fcBytes.Data.Should().BeSameAs(arr);
+        fcBytes.Type.Should().Be(typeof(byte[]));
+        fcBytes.IsStream.Should().BeFalse();
+        fcBytes.IsByteArray.Should().BeTrue();
+        fcBytes.IsUrl.Should().BeFalse();
+        fcBytes.Stream.Should().BeNull();
+        fcBytes.ByteArray.Should().BeSameAs(arr);
+        fcBytes.Url.Should().BeNull();
+
+        string url = "http://x";
+        TnTFileDownload.FileContents fcUrl = url;
+        fcUrl.Data.Should().Be(url);
+        fcUrl.Type.Should().Be(typeof(string));
+        fcUrl.IsStream.Should().BeFalse();
+        fcUrl.IsByteArray.Should().BeFalse();
+        fcUrl.IsUrl.Should().BeTrue();
+        fcUrl.Stream.Should().BeNull();
+        fcUrl.ByteArray.Should().BeNull();
+        fcUrl.Url.Should().Be(url);
+    }
+
+    [Fact]
+    public void FileContents_ImplicitOperator_EmptyByteArray_ReturnsSingleton() {
+        byte[] empty = Array.Empty<byte>();
+        var fc = (TnTFileDownload.FileContents)empty;
+        fc.Should().BeSameAs(TnTFileDownload.FileContents.EmptyByteArray);
+    }
+
+    [Fact]
+    public void FileContents_Dispose_CanBeCalledTwiceSafely() {
+        var ms = new System.IO.MemoryStream();
+        TnTFileDownload.FileContents fc = ms;
+        fc.Dispose();
+        fc.Dispose(); // Should not throw
+    }
+
+    [Fact]
+    public void TnTFileDownload_Dispose_CanBeCalledTwiceSafely() {
+        var ms = new System.IO.MemoryStream(new byte[] { 1 });
+        var file = new TnTFileDownload {
+            Filename = "b.txt",
+            ContentType = "text/plain",
+            Contents = ms
+        };
+        file.Dispose();
+        file.Dispose(); // Should not throw
+    }
+
+    [Fact]
+    public void FileContents_JsonConstructor_AllowsInit() {
+        var fc = (TnTFileDownload.FileContents)Activator.CreateInstance(typeof(TnTFileDownload.FileContents), true)!;
+        fc.Should().NotBeNull();
+        // Data is null by default
+        fc.Data.Should().BeNull();
+        fc.Type.Should().BeNull();
+        fc.IsStream.Should().BeFalse();
+        fc.IsByteArray.Should().BeFalse();
+        fc.IsUrl.Should().BeFalse();
+    }
+
+    [Fact]
+    public void FileContents_Dispose_NonStreamType_DoesNotThrow() {
+        TnTFileDownload.FileContents fc = new byte[] { 1, 2 };
+        fc.Dispose();
+        fc.Dispose(); // Should not throw
+        TnTFileDownload.FileContents fc2 = "url";
+        fc2.Dispose();
+        fc2.Dispose(); // Should not throw
+    }
 }
