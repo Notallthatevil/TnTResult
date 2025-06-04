@@ -3,6 +3,7 @@
 // </copyright>
 
 using Refit;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -16,6 +17,7 @@ namespace TnTResult.Refit.Ext;
 ///     This class implements a subset of RFC 7807 Problem Details for HTTP APIs specification.
 ///     See: https://tools.ietf.org/html/rfc7807
 /// </remarks>
+[ExcludeFromCodeCoverage]
 internal class ProblemDetails {
 
     /// <summary>
@@ -117,7 +119,7 @@ public static class IApiResponseExt {
                 return TnTResult.Successful;
             }
             else {
-                return HandleErrorResponse<object>(apiResponse);
+                return HandleErrorResponse<Empty>(apiResponse);
             }
         }
     }
@@ -241,7 +243,7 @@ public static class IApiResponseExt {
     /// </remarks>
     /// <example>
     ///     <code>
-    ///// Direct async conversion ITnTResult result = await apiClient.UpdateUserAsync(user).ToTnTResultAsync();
+    ///ITnTResult result = await apiClient.UpdateUserAsync(user).ToTnTResultAsync();
     ///     </code>
     /// </example>
     public static async Task<ITnTResult> ToTnTResultAsync(this Task<IApiResponse> task) {
@@ -274,7 +276,6 @@ public static class IApiResponseExt {
     /// <example>
     ///     <code>
     /// // Direct async conversion ITnTResult&lt;User&gt; result = await apiClient.GetUserAsync(userId).ToTnTResultAsync();
-    ///
     ///
     ///if (result.IsSuccess) { UserList users = result.Value; Console.WriteLine($"Retrieved {users.Count} users"); }
     ///     </code>
@@ -439,4 +440,6 @@ public static class IApiResponseExt {
             return false;
         }
     }
+
+    private readonly struct Empty { }
 }

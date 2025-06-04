@@ -39,7 +39,7 @@ internal readonly struct InternalTnTResult : ITnTResult {
 
     internal readonly Optional<Exception> _error;
 
-    internal InternalTnTResult(Exception? error) => _error = error!;
+    internal InternalTnTResult(Exception error) => _error = Optional.MakeOptional(error);
 
     /// <inheritdoc />
     public ITnTResult Finally(Action action) {
@@ -86,9 +86,9 @@ internal readonly struct InternalTnTResult<TSuccess> : ITnTResult<TSuccess> {
 
     public readonly Expected<TSuccess, Exception> _result;
 
-    internal InternalTnTResult(TSuccess value) => _result = value;
+    internal InternalTnTResult(TSuccess value) => _result = Expected.MakeExpected<TSuccess, Exception>(value);
 
-    internal InternalTnTResult(Exception error) => _result = error;
+    internal InternalTnTResult(Exception error) => _result = Expected.MakeUnexpected<TSuccess, Exception>(error);
 
     /// <inheritdoc />
     public ITnTResult<TSuccess> Finally(Action action) {
