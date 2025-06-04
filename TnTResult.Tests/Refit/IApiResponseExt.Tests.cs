@@ -13,6 +13,44 @@ namespace TnTResult_Tests.Refit;
 
 public class IApiResponseExtTests {
     [Fact]
+    public void ToTnTResultT_ReturnsLocation_OnRedirectWithLocation_String() {
+        // Arrange
+        var mockResponse = Substitute.For<IApiResponse<string>>();
+        mockResponse.IsSuccessStatusCode.Returns(true);
+        mockResponse.StatusCode.Returns(HttpStatusCode.Found); // 302
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.Found);
+        responseMessage.Headers.Location = new Uri("https://test/redirect");
+        mockResponse.Headers.Returns(responseMessage.Headers);
+        mockResponse.Content.Returns((string)null!);
+
+        // Act
+        var result = mockResponse.ToTnTResult();
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.Value.Should().Be("https://test/redirect");
+    }
+
+    [Fact]
+    public void ToTnTResultT_ReturnsLocation_OnRedirectWithLocation_Uri() {
+        // Arrange
+        var mockResponse = Substitute.For<IApiResponse<Uri>>();
+        mockResponse.IsSuccessStatusCode.Returns(true);
+        mockResponse.StatusCode.Returns(HttpStatusCode.Found); // 302
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.Found);
+        responseMessage.Headers.Location = new Uri("https://test/redirect");
+        mockResponse.Headers.Returns(responseMessage.Headers);
+        mockResponse.Content.Returns((Uri)null!);
+
+        // Act
+        var result = mockResponse.ToTnTResult();
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.Value.Should().Be(new Uri("https://test/redirect"));
+    }
+
+    [Fact]
     public async Task ToTnTResultAsync_ThrowsOnCancelledTask() {
         // Arrange
         var tcs = new TaskCompletionSource<IApiResponse>();

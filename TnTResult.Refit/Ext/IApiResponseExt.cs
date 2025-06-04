@@ -156,12 +156,24 @@ public static class IApiResponseExt {
         }
         using (apiResponse) {
             if (apiResponse.IsSuccessStatusCode) {
-                // Handle special case for Created status with Location header This is commonly used in REST APIs where POST operations return the location of the created resource
+                // Handle special case for Created status with Location header
                 if (apiResponse.StatusCode == HttpStatusCode.Created &&
                     apiResponse.Headers.Location is not null &&
                     typeof(TSuccess) == typeof(string)) {
                     var locationValue = (TSuccess)Convert.ChangeType(apiResponse.Headers.Location.ToString(), typeof(TSuccess));
                     return TnTResult.Success(locationValue);
+                }
+
+                // Specialization: If status code is a redirect (3xx), and TSuccess is string or Uri, populate with Location header
+                if (apiResponse.StatusCode is HttpStatusCode.Found or HttpStatusCode.TemporaryRedirect or HttpStatusCode.MovedPermanently && apiResponse.Headers.Location is not null) {
+                    if (typeof(TSuccess) == typeof(string)) {
+                        var locationValue = (TSuccess)Convert.ChangeType(apiResponse.Headers.Location.ToString(), typeof(TSuccess));
+                        return TnTResult.Success(locationValue);
+                    }
+                    else if (typeof(TSuccess) == typeof(Uri)) {
+                        var locationValue = (TSuccess)Convert.ChangeType(apiResponse.Headers.Location, typeof(TSuccess));
+                        return TnTResult.Success(locationValue);
+                    }
                 }
 
                 return TnTResult.Success(apiResponse.Content!);
