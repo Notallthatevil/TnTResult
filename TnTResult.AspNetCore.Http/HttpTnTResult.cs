@@ -157,14 +157,14 @@ public sealed class HttpTnTResult : ITnTResult, IHttpTnTResult {
     /// </summary>
     /// <param name="value">The optional value to include in the response body.</param>
     /// <returns>A new <see cref="HttpTnTResult" /> representing a not found error.</returns>
-    public static HttpTnTResult NotFound(object? value = null) => new(new NotFoundException(value?.ToString() ?? "Resource not found"), TypedResults.NotFound(value));
+    public static HttpTnTResult NotFound<T>(T? value = default) => new(new NotFoundException(value?.ToString() ?? "Resource not found"), TypedResults.NotFound(value));
 
     /// <summary>
     ///     Creates an HTTP 400 Bad Request response with the specified error information.
     /// </summary>
     /// <param name="error">The optional error information to include in the response.</param>
     /// <returns>A new <see cref="HttpTnTResult" /> representing a bad request error.</returns>
-    public static HttpTnTResult BadRequest(object? error = null) => new(new ArgumentException(error?.ToString() ?? "Bad request"), TypedResults.BadRequest(error));
+    public static HttpTnTResult BadRequest<T>(T? error = default) => new(new ArgumentException(error?.ToString() ?? "Bad request"), TypedResults.BadRequest(error));
 
     /// <summary>
     ///     Creates an HTTP 401 Unauthorized response.

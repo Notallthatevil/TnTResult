@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using TnTResult.Exceptions;
 
@@ -10,6 +11,7 @@ namespace TnTResult.AspNetCore.Http;
 ///     Base controller class providing common result handling methods. Optimized for performance with cached static instances and efficient memory usage.
 /// </summary>
 [ApiController]
+[ExcludeFromCodeCoverage]
 public abstract class ControllerRepositoryBase : ControllerBase {
 
     /// <summary>
