@@ -2,8 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 using AwesomeAssertions;
+using TnTResult;
 
-namespace TnTResult.Tests.TnTResult; 
+namespace TnTResult_Tests;
 
 public class OptionalTests {
 

@@ -1,9 +1,6 @@
-using System;
-using Xunit;
-using AwesomeAssertions;
-using global::TnTResult;
+using TnTResult;
 
-namespace TnTResult.Tests.TnTResult;
+namespace TnTResult_Tests;
 
 public class TnTResultTests {
 
