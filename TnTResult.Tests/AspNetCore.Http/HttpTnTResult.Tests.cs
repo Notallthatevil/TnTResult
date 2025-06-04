@@ -12,14 +12,51 @@ using AwesomeAssertions;
 namespace TnTResult_Tests.AspNetCore.Http;
 
 public class HttpTnTResultTests {
+
     [Fact]
-    public void Successful_ShouldBeSuccessful() {
-        // Arrange & Act
-        var result = HttpTnTResult.Successful;
+    public void Accepted_ShouldReturnAcceptedResult() {
+        // Act
+        var result = HttpTnTResult.Accepted();
 
         // Assert
         result.IsSuccessful.Should().BeTrue();
-        result.HasFailed.Should().BeFalse();
+        result.Result.Should().BeOfType<Accepted>();
+    }
+
+    [Fact]
+    public void BadRequest_ShouldReturnBadRequestResult() {
+        // Act
+        var result = HttpTnTResult.BadRequest("bad");
+
+        // Assert
+        result.IsSuccessful.Should().BeFalse();
+        result.Error.Should().BeOfType<ArgumentException>();
+        result.Result.Should().BeOfType<BadRequest<string>>();
+    }
+
+    [Fact]
+    public void Created_ShouldReturnCreatedResult() {
+        // Act
+        var result = HttpTnTResult.Created();
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.Result.Should().BeOfType<Created>();
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_DelegatesToResult() {
+        // Arrange
+        var httpContext = Substitute.For<HttpContext>();
+        var innerResult = Substitute.For<IResult>();
+        innerResult.ExecuteAsync(httpContext).Returns(Task.CompletedTask);
+        var result = HttpTnTResult.CustomResult(innerResult);
+
+        // Act
+        await result.ExecuteAsync(httpContext);
+
+        // Assert
+        await innerResult.Received(1).ExecuteAsync(httpContext);
     }
 
     [Fact]
@@ -37,36 +74,16 @@ public class HttpTnTResultTests {
     }
 
     [Fact]
-    public void NotFound_ShouldReturnNotFoundResult() {
+    public void Finally_InvokesAction_Always() {
+        // Arrange
+        var result = HttpTnTResult.Successful;
+        bool called = false;
+
         // Act
-        var result = HttpTnTResult.NotFound("missing");
+        result.Finally(() => called = true);
 
         // Assert
-        result.IsSuccessful.Should().BeFalse();
-        result.Error.Should().BeOfType<NotFoundException>();
-        result.Result.Should().BeOfType<NotFound<string>>();
-    }
-
-    [Fact]
-    public void BadRequest_ShouldReturnBadRequestResult() {
-        // Act
-        var result = HttpTnTResult.BadRequest("bad");
-
-        // Assert
-        result.IsSuccessful.Should().BeFalse();
-        result.Error.Should().BeOfType<ArgumentException>();
-        result.Result.Should().BeOfType<BadRequest<string>>();
-    }
-
-    [Fact]
-    public void Unauthorized_ShouldReturnUnauthorizedResult() {
-        // Act
-        var result = HttpTnTResult.Unauthorized();
-
-        // Assert
-        result.IsSuccessful.Should().BeFalse();
-        result.Error.Should().BeOfType<UnauthorizedAccessException>();
-        result.Result.Should().BeOfType<UnauthorizedHttpResult>();
+        called.Should().BeTrue();
     }
 
     [Fact]
@@ -81,26 +98,6 @@ public class HttpTnTResultTests {
     }
 
     [Fact]
-    public void Accepted_ShouldReturnAcceptedResult() {
-        // Act
-        var result = HttpTnTResult.Accepted();
-
-        // Assert
-        result.IsSuccessful.Should().BeTrue();
-        result.Result.Should().BeOfType<Accepted>();
-    }
-
-    [Fact]
-    public void Created_ShouldReturnCreatedResult() {
-        // Act
-        var result = HttpTnTResult.Created();
-
-        // Assert
-        result.IsSuccessful.Should().BeTrue();
-        result.Result.Should().BeOfType<Created>();
-    }
-
-    [Fact]
     public void NoContent_ShouldReturnNoContentResult() {
         // Act
         var result = HttpTnTResult.NoContent();
@@ -111,41 +108,14 @@ public class HttpTnTResultTests {
     }
 
     [Fact]
-    public void Redirect_WithUri_ShouldReturnRedirectResult() {
-        // Arrange
-        var uri = new Uri("https://example.com");
-
+    public void NotFound_ShouldReturnNotFoundResult() {
         // Act
-        var result = HttpTnTResult.Redirect(uri);
+        var result = HttpTnTResult.NotFound("missing");
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
-        result.Result.Should().BeOfType<RedirectHttpResult>();
-    }
-
-    [Fact]
-    public void Redirect_WithString_ShouldReturnRedirectResult() {
-        // Act
-        var result = HttpTnTResult.Redirect("/path");
-
-        // Assert
-        result.IsSuccessful.Should().BeTrue();
-        result.Result.Should().BeOfType<RedirectHttpResult>();
-    }
-
-    [Fact]
-    public async Task ExecuteAsync_DelegatesToResult() {
-        // Arrange
-        var httpContext = Substitute.For<HttpContext>();
-        var innerResult = Substitute.For<IResult>();
-        innerResult.ExecuteAsync(httpContext).Returns(Task.CompletedTask);
-        var result = HttpTnTResult.CustomResult(innerResult);
-
-        // Act
-        await result.ExecuteAsync(httpContext);
-
-        // Assert
-        await innerResult.Received(1).ExecuteAsync(httpContext);
+        result.IsSuccessful.Should().BeFalse();
+        result.Error.Should().BeOfType<NotFoundException>();
+        result.Result.Should().BeOfType<NotFound<string>>();
     }
 
     [Fact]
@@ -176,15 +146,46 @@ public class HttpTnTResultTests {
     }
 
     [Fact]
-    public void Finally_InvokesAction_Always() {
-        // Arrange
-        var result = HttpTnTResult.Successful;
-        bool called = false;
-
+    public void Redirect_WithString_ShouldReturnRedirectResult() {
         // Act
-        result.Finally(() => called = true);
+        var result = HttpTnTResult.Redirect("/path");
 
         // Assert
-        called.Should().BeTrue();
+        result.IsSuccessful.Should().BeTrue();
+        result.Result.Should().BeOfType<RedirectHttpResult>();
+    }
+
+    [Fact]
+    public void Redirect_WithUri_ShouldReturnRedirectResult() {
+        // Arrange
+        var uri = new Uri("https://example.com");
+
+        // Act
+        var result = HttpTnTResult.Redirect(uri);
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.Result.Should().BeOfType<RedirectHttpResult>();
+    }
+
+    [Fact]
+    public void Successful_ShouldBeSuccessful() {
+        // Arrange & Act
+        var result = HttpTnTResult.Successful;
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.HasFailed.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Unauthorized_ShouldReturnUnauthorizedResult() {
+        // Act
+        var result = HttpTnTResult.Unauthorized();
+
+        // Assert
+        result.IsSuccessful.Should().BeFalse();
+        result.Error.Should().BeOfType<UnauthorizedAccessException>();
+        result.Result.Should().BeOfType<UnauthorizedHttpResult>();
     }
 }

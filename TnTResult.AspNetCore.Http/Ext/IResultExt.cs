@@ -104,7 +104,7 @@ public static class IResultExt {
     ///return result.ToIResult(uri: "/new-location", successStatusCode: HttpStatusCode.Redirect);
     ///     </code>
     /// </example>
-    public static IResult ToIResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
+    public static IResult ToIResult(this ITnTResult result, object? content = null, string? uri = null, HttpStatusCode? successStatusCode = null) {
         // Fast path for HTTP results that already have an IResult
         if (result is IHttpTnTResult httpTnTResult && httpTnTResult.Result is not null) {
             return httpTnTResult.Result;
@@ -112,9 +112,11 @@ public static class IResultExt {
 
         if (result.IsSuccessful) {
             // Handle no-content scenarios
-            if (content is null && successStatusCode is not (HttpStatusCode.Created or HttpStatusCode.Accepted)) {
+            if (content is null && successStatusCode is null) {
                 return TypedResults.NoContent();
             }
+
+            successStatusCode ??= HttpStatusCode.OK;
 
             return successStatusCode switch {
                 HttpStatusCode.OK => content is string str ? TypedResults.Text(str, "text/plain") : TypedResults.Ok(content),
@@ -153,7 +155,7 @@ public static class IResultExt {
     ///return createResult.ToIResult(uri: $"/users/{createResult.Value?.Id}", HttpStatusCode.Created);
     ///     </code>
     /// </example>
-    public static IResult ToIResult<TSuccess>(this ITnTResult<TSuccess> result, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) => result.ToIResult(result.IsSuccessful ? result.Value : null, uri, successStatusCode);
+    public static IResult ToIResult<TSuccess>(this ITnTResult<TSuccess> result, string? uri = null, HttpStatusCode? successStatusCode = null) => result.ToIResult(result.IsSuccessful ? result.Value : null, uri, successStatusCode);
 
     /// <summary>
     ///     Converts an <see cref="ITnTResult{Stream}" /> to an <see cref="IResult" /> for file streaming scenarios.
@@ -252,7 +254,7 @@ public static class IResultExt {
     ///userService.GetAllUsersAsync().ToIResultAsync());
     ///     </code>
     /// </example>
-    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult> task, object? content = null, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
+    public static async Task<IResult> ToIResultAsync(this Task<ITnTResult> task, object? content = null, string? uri = null, HttpStatusCode? successStatusCode = null) {
         var result = await task.ConfigureAwait(false);
         return result.ToIResult(content, uri, successStatusCode);
     }
@@ -278,7 +280,7 @@ public static class IResultExt {
     ///userService.CreateUserAsync(request).ToIResultAsync(successStatusCode: HttpStatusCode.Created));
     ///     </code>
     /// </example>
-    public static async Task<IResult> ToIResultAsync<TSuccess>(this Task<ITnTResult<TSuccess>> task, string? uri = null, HttpStatusCode successStatusCode = HttpStatusCode.OK) {
+    public static async Task<IResult> ToIResultAsync<TSuccess>(this Task<ITnTResult<TSuccess>> task, string? uri = null, HttpStatusCode? successStatusCode = null) {
         var result = await task.ConfigureAwait(false);
         return result.ToIResult(uri, successStatusCode);
     }
