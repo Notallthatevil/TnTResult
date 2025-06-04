@@ -12,7 +12,7 @@ namespace TnTResult.AspNetCore.Http;
 /// </summary>
 [ApiController]
 [ExcludeFromCodeCoverage]
-public abstract class ControllerRepositoryBase : ControllerBase {
+public abstract class TnTResultControllerBase : ControllerBase {
 
     /// <summary>
     ///     Gets a result indicating a forbidden failure.
