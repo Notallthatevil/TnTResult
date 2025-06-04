@@ -1,17 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>TnTResult.Refit</Title>
+        <Description>Refit integration for TnTResult, enabling functional result types in Refit-based HTTP clients for .NET.</Description>
+        <PackageTags>refit;result;functional;dotnet;httpclient;NTTechnologies</PackageTags>
+        <Authors>NT Technologies</Authors>
+        <Company>NT Technologies</Company>
+        <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIconUrl>https://raw.githubusercontent.com/Notallthatevil/TnTResult/main/icon.png</PackageIconUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSource>true</IncludeSource>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Refit" Version="8.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Refit" Version="8.0.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TnTResult\TnTResult.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\TnTResult\TnTResult.csproj" />
+    </ItemGroup>
 
 </Project>

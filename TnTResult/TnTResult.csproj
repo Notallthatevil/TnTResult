@@ -6,11 +6,38 @@
         <Nullable>enable</Nullable>
         <SignAssembly>False</SignAssembly>
         <Title>TnTResult</Title>
+        <Description>Lightweight, functional result and option types for .NET, with extensions for ASP.NET Core and Refit integration. Simplifies error handling and functional programming patterns.</Description>
+        <PackageTags>result;option;functional;dotnet;aspnetcore;refit;error-handling;NTTechnologies</PackageTags>
+        <Authors>NT Technologies</Authors>
+        <Company>NT Technologies</Company>
         <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIconUrl>https://raw.githubusercontent.com/Notallthatevil/TnTResult/main/icon.png</PackageIconUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSource>true</IncludeSource>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
+      <WarningLevel>8</WarningLevel>
     </PropertyGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="TnTResult.AspNetCore.Http" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
     </ItemGroup>
 </Project>
