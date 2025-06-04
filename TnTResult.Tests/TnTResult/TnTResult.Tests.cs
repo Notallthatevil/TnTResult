@@ -73,14 +73,12 @@ public class TnTResultTests {
         var failureExecuted = false;
 
         // Act
-        var successReturnedResult = successResult.Finally(() => successExecuted = true);
-        var failureReturnedResult = failureResult.Finally(() => failureExecuted = true);
+        successResult.Finally(() => successExecuted = true);
+        failureResult.Finally(() => failureExecuted = true);
 
         // Assert
         successExecuted.Should().BeTrue();
         failureExecuted.Should().BeTrue();
-        successReturnedResult.Should().Be(successResult);
-        failureReturnedResult.Should().Be(failureResult);
     }
 
     [Fact]
@@ -92,14 +90,12 @@ public class TnTResultTests {
         var failureExecuted = false;
 
         // Act
-        var successReturnedResult = successResult.Finally(() => successExecuted = true);
-        var failureReturnedResult = failureResult.Finally(() => failureExecuted = true);
+        successResult.Finally(() => successExecuted = true);
+        failureResult.Finally(() => failureExecuted = true);
 
         // Assert
         successExecuted.Should().BeTrue();
         failureExecuted.Should().BeTrue();
-        successReturnedResult.Should().Be(successResult);
-        failureReturnedResult.Should().Be(failureResult);
     }
 
     [Fact]
@@ -159,14 +155,13 @@ public class TnTResultTests {
         var finallyExecuted = false;
 
         // Act
-        var chainedResult = result
+        result
             .OnSuccess(value => onSuccessExecuted = true)
             .Finally(() => finallyExecuted = true);
 
         // Assert
         onSuccessExecuted.Should().BeTrue();
         finallyExecuted.Should().BeTrue();
-        chainedResult.Should().Be(result);
     }
 
     [Fact]
@@ -179,7 +174,7 @@ public class TnTResultTests {
         var finallyExecuted = false;
 
         // Act
-        var chainedResult = result
+        result
             .OnSuccess(value => onSuccessExecuted = true)
             .OnFailure(error => onFailureExecuted = true)
             .Finally(() => finallyExecuted = true);
@@ -188,7 +183,6 @@ public class TnTResultTests {
         onSuccessExecuted.Should().BeFalse();
         onFailureExecuted.Should().BeTrue();
         finallyExecuted.Should().BeTrue();
-        chainedResult.Should().Be(result);
     }
 
     [Fact]

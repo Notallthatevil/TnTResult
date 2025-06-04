@@ -179,4 +179,50 @@ public class TnTResultExtTests {
         var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(async v => { value = v; await Task.Yield(); });
         value.Should().Be("ok");
     }
+
+    [Fact]
+    public async Task FinallyAsync_Task_CalledRegardlessOfResult()
+    {
+        var result = global::TnTResult.TnTResult.Successful;
+        var called = false;
+        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        called.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task FinallyAsync_Task_CalledOnFailure()
+    {
+        var ex = new Exception("fail");
+        var result = global::TnTResult.TnTResult.Failure(ex);
+        var called = false;
+        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        called.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task FinallyAsync_ValueTask_CalledRegardlessOfResult()
+    {
+        var result = global::TnTResult.TnTResult.Successful;
+        var called = false;
+        await new ValueTask<global::TnTResult.ITnTResult>(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        called.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task FinallyAsync_TaskT_CalledRegardlessOfResult()
+    {
+        var result = global::TnTResult.TnTResult.Success("ok");
+        var called = false;
+        await Task.FromResult(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); });
+        called.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task FinallyAsync_ValueTaskT_CalledRegardlessOfResult()
+    {
+        var result = global::TnTResult.TnTResult.Success("ok");
+        var called = false;
+        await new ValueTask<global::TnTResult.ITnTResult<string>>(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); });
+        called.Should().BeTrue();
+    }
 }

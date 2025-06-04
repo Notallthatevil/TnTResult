@@ -31,8 +31,7 @@ public interface ITnTResult {
     ///     Executes the specified action regardless of success or failure.
     /// </summary>
     /// <param name="action">The action to execute after the operation completes.</param>
-    /// <returns>The current result instance for method chaining.</returns>
-    ITnTResult Finally(Action action);
+    void Finally(Action action);
 
     /// <summary>
     ///     Executes the specified action if the operation has failed.
@@ -59,13 +58,6 @@ public interface ITnTResult<TSuccess> : ITnTResult {
     ///     Gets the success value if the operation was successful. Only valid when <see cref="ITnTResult.IsSuccessful" /> is <c>true</c>.
     /// </summary>
     TSuccess Value { get; }
-
-    /// <summary>
-    ///     Executes the specified action regardless of success or failure.
-    /// </summary>
-    /// <param name="action">The action to execute after the operation completes.</param>
-    /// <returns>The current result instance for method chaining.</returns>
-    new ITnTResult<TSuccess> Finally(Action action);
 
     /// <summary>
     ///     Executes the specified action if the operation has failed.

@@ -10,13 +10,13 @@ public static class TnTResult {
     /// <inheritdoc cref="ITnTResult.IsSuccessful" />
     public static ITnTResult Successful => new InternalTnTResult();
 
-    /// <inheritdoc cref="ITnTResult.Failure(Exception)" />
+    /// <inheritdoc />
     public static ITnTResult<TSuccess> Failure<TSuccess>(Exception error) => new InternalTnTResult<TSuccess>(error);
 
-    /// <inheritdoc cref="ITnTResult.Failure(Exception)" />
+    /// <inheritdoc  />
     public static ITnTResult Failure(Exception error) => new InternalTnTResult(error);
 
-    /// <inheritdoc cref="ITnTResult{TSuccess}.Success(TSuccess)" />
+    /// <inheritdoc />
     public static ITnTResult<TSuccess> Success<TSuccess>(TSuccess value) => new InternalTnTResult<TSuccess>(value);
 }
 
@@ -42,9 +42,8 @@ internal readonly struct InternalTnTResult : ITnTResult {
     internal InternalTnTResult(Exception error) => _error = Optional.MakeOptional(error);
 
     /// <inheritdoc />
-    public ITnTResult Finally(Action action) {
+    public void Finally(Action action) {
         action();
-        return this;
     }
 
     /// <inheritdoc />
@@ -91,9 +90,8 @@ internal readonly struct InternalTnTResult<TSuccess> : ITnTResult<TSuccess> {
     internal InternalTnTResult(Exception error) => _result = Expected.MakeUnexpected<TSuccess, Exception>(error);
 
     /// <inheritdoc />
-    public ITnTResult<TSuccess> Finally(Action action) {
+    public void Finally(Action action) {
         action();
-        return this;
     }
 
     /// <inheritdoc />
@@ -131,7 +129,7 @@ internal readonly struct InternalTnTResult<TSuccess> : ITnTResult<TSuccess> {
     }
 
     /// <inheritdoc />
-    ITnTResult ITnTResult.Finally(Action action) => Finally(action);
+    void ITnTResult.Finally(Action action) => Finally(action);
 
     /// <inheritdoc />
     ITnTResult ITnTResult.OnFailure(Action<Exception> action) => OnFailure(action);

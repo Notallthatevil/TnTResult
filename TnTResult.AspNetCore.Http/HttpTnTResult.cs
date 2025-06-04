@@ -259,12 +259,8 @@ public sealed class HttpTnTResult : ITnTResult, IHttpTnTResult {
     ///     Executes the specified action regardless of whether the result is successful or not.
     /// </summary>
     /// <param name="action">The action to execute.</param>
-    /// <returns>The current instance for method chaining.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="action" /> is null.</exception>
-    public ITnTResult Finally(Action action) {
-        action();
-        return this;
-    }
+    public void Finally(Action action) => action();
 }
 
 /// <summary>
@@ -525,12 +521,7 @@ public sealed class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResu
     ///     Executes the specified action regardless of whether the result is successful or not.
     /// </summary>
     /// <param name="action">The action to execute.</param>
-    /// <returns>The current instance for method chaining.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="action" /> is null.</exception>
-    public ITnTResult<TSuccess> Finally(Action action) {
-        action();
-        return this;
-    }
+    public void Finally(Action action) => action();
 
     /// <summary>
     ///     Attempts to get the success value from the result.
@@ -555,11 +546,6 @@ public sealed class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResu
     ///     Explicitly implements the non-generic interface methods to support polymorphic usage.
     /// </summary>
     ITnTResult ITnTResult.OnSuccess(Action action) => OnSuccess(action);
-
-    /// <summary>
-    ///     Explicitly implements the non-generic interface methods to support polymorphic usage.
-    /// </summary>
-    ITnTResult ITnTResult.Finally(Action action) => Finally(action);
 
     /// <summary>
     ///     Executes the result asynchronously by delegating to the underlying IResult implementation.

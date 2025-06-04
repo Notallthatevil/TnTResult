@@ -6,6 +6,94 @@
 public static class TnTResultExt {
 
     /// <summary>
+    ///     Executes the specified action regardless of the result (finally pattern).
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute after the result completes.</param>
+    public static async Task FinallyAsync(this Task<ITnTResult> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified action regardless of the result (finally pattern).
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute after the result completes.</param>
+    public static async ValueTask FinallyAsync(this ValueTask<ITnTResult> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified action regardless of the result (finally pattern).
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute after the result completes.</param>
+    public static async Task FinallyAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified action regardless of the result (finally pattern).
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="action">The action to execute after the result completes.</param>
+    public static async ValueTask FinallyAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Action action) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(action);
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function regardless of the result (finally pattern).
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute after the result completes.</param>
+    /// <returns>The original result.</returns>
+    public static async Task FinallyAsync(this Task<ITnTResult> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(() => AsyncHelper.RunSync(func));
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function regardless of the result (finally pattern).
+    /// </summary>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute after the result completes.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask FinallyAsync(this ValueTask<ITnTResult> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(() => AsyncHelper.RunSync(func));
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function regardless of the result (finally pattern).
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute after the result completes.</param>
+    /// <returns>The original result.</returns>
+    public static async Task FinallyAsync<TSuccess>(this Task<ITnTResult<TSuccess>> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(() => AsyncHelper.RunSync(func));
+    }
+
+    /// <summary>
+    ///     Executes the specified asynchronous function regardless of the result (finally pattern).
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the success value.</typeparam>
+    /// <param name="result">The asynchronous result to evaluate.</param>
+    /// <param name="func">  The asynchronous function to execute after the result completes.</param>
+    /// <returns>The original result.</returns>
+    public static async ValueTask FinallyAsync<TSuccess>(this ValueTask<ITnTResult<TSuccess>> result, Func<Task> func) {
+        var r = await result.ConfigureAwait(false);
+        r.Finally(() => AsyncHelper.RunSync(func));
+    }
+
+    /// <summary>
     ///     Executes the specified action if the result has failed.
     /// </summary>
     /// <param name="result">The asynchronous result to evaluate.</param>
