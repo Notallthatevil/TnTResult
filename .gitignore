@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+TnTResult/Logo.png
+TnTResult.AspNetCore.Http/Logo.png
+TnTResult.Refit/Logo.png

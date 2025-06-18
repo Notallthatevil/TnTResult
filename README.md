@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="Logo.svg" alt="TnTResult Logo" width="128" height="128" />
+  <img src="Logo.png" alt="TnTResult Logo" width="128" height="128" />
 </p>
 
 # TnTResult Solution

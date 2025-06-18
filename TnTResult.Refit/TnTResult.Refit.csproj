@@ -12,7 +12,8 @@
         <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIcon>Logo.svg</PackageIcon>
+
+        <PackageIcon>Logo.png</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1591</NoWarn>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,6 +24,17 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyLogoForNuget" BeforeTargets="PrepareForBuild">
+    <Copy SourceFiles="$(SolutionDir)Logo.png" DestinationFolder="$(MSBuildThisFileDirectory)" SkipUnchangedFiles="true" />
+  </Target>
 
     <ItemGroup>
       <None Include="..\README.md">
