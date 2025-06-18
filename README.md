@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img src="Logo.svg" alt="TnTResult Logo" width="128" height="128" />
+</p>
+
 # TnTResult Solution
 
 TnTResult is a .NET solution providing a set of libraries for handling result types, error handling, and HTTP integration in C# applications. It is designed to improve code clarity, error propagation, and integration with ASP.NET Core and Refit-based APIs.

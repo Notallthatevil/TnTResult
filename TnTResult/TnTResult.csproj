@@ -7,16 +7,22 @@
         <SignAssembly>False</SignAssembly>
         <Title>TnTResult</Title>
         <Description>Lightweight, functional result and option types for .NET, with extensions for ASP.NET Core and Refit integration. Simplifies error handling and functional programming patterns.</Description>
-        <PackageTags>result;option;functional;dotnet;aspnetcore;refit;error-handling;NTTechnologies</PackageTags>
+        <PackageTags>result;option;functional;dotnet;library;error-handling;monad;nullable;optional;utility;NTTechnologies;C#;F#;VB.NET;cross-platform;open-source;core</PackageTags>
         <Authors>NT Technologies</Authors>
         <Company>NT Technologies</Company>
         <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIconUrl>https://raw.githubusercontent.com/Notallthatevil/TnTResult/main/icon.png</PackageIconUrl>
+        <PackageIcon>Logo.svg</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1591</NoWarn>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <Copyright>Copyright © NT Technologies 2025</Copyright>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
@@ -29,6 +35,17 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="TnTResult.AspNetCore.Http" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\$(Configuration)\net8.0\TnTResult.xml">
+        <Pack>True</Pack>
+        <PackagePath>lib\net8.0\</PackagePath>
+      </None>
+      <None Include="bin\$(Configuration)\net9.0\TnTResult.xml">
+        <Pack>True</Pack>
+        <PackagePath>lib\net9.0\</PackagePath>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

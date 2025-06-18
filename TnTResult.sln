@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.github\workflows\PublishToNuget.yml = .github\workflows\PublishToNuget.yml
+		Logo.svg = Logo.svg
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TnTResult.Tests", "TnTResult.Tests\TnTResult.Tests.csproj", "{FE5C5033-F8D5-7BBE-F362-8ED221319096}"

@@ -6,20 +6,37 @@
         <Nullable>enable</Nullable>
         <Title>TnTResult.AspNetCore.Http</Title>
         <Description>ASP.NET Core integration for TnTResult, providing seamless result handling and controller extensions for web APIs.</Description>
-        <PackageTags>aspnetcore;result;functional;dotnet;webapi;NTTechnologies</PackageTags>
+        <PackageTags>aspnetcore;webapi;result;functional;dotnet;http;controller;extension;middleware;NTTechnologies;C#;web;api;core;open-source;integration;error-handling</PackageTags>
         <Authors>NT Technologies</Authors>
         <Company>NT Technologies</Company>
         <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIconUrl>https://raw.githubusercontent.com/Notallthatevil/TnTResult/main/icon.png</PackageIconUrl>
+        <PackageIcon>Logo.svg</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1591</NoWarn>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <Copyright>Copyright © NT Technologies 2025</Copyright>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\$(Configuration)\net8.0\TnTResult.AspNetCore.Http.xml">
+        <Pack>True</Pack>
+        <PackagePath>lib\net8.0\</PackagePath>
+      </None>
+      <None Include="bin\$(Configuration)\net9.0\TnTResult.AspNetCore.Http.xml">
+        <Pack>True</Pack>
+        <PackagePath>lib\net9.0\</PackagePath>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
