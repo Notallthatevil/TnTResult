@@ -221,7 +221,7 @@ public static class IResultExt {
 
         return fileDownload.Contents switch {
             { IsStream: true } when fileDownload.Contents.Stream is not null => CreateFileStreamResult(fileDownload.Contents.Stream, fileDownload.ContentType, fileDownload.Filename),
-            { IsUrl: true } => TypedResults.Redirect(fileDownload.Contents.Url!),
+            { IsUrl: true } => TypedResults.Text(fileDownload.Contents.Url!),
             { IsByteArray: true } when fileDownload.Contents.ByteArray is not null => TypedResults.File(fileDownload.Contents.ByteArray, fileDownload.ContentType, fileDownload.Filename),
             _ => TypedResults.NoContent()
         };

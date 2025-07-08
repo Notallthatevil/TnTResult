@@ -328,7 +328,7 @@ public class IResultExtTests {
         var iResult = fileResult.ToIResult();
 
         // Assert
-        iResult.Should().BeOfType<RedirectHttpResult>();
+        iResult.Should().BeOfType<ContentHttpResult>();
     }
 
     [Fact]
