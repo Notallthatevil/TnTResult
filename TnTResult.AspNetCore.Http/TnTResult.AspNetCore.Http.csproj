@@ -43,11 +43,11 @@
     <ItemGroup>
       <None Include="bin\$(Configuration)\net8.0\TnTResult.AspNetCore.Http.xml">
         <Pack>True</Pack>
-        <PackagePath>lib\net8.0\</PackagePath>
+        <PackagePath>lib\net8.0</PackagePath>
       </None>
       <None Include="bin\$(Configuration)\net9.0\TnTResult.AspNetCore.Http.xml">
         <Pack>True</Pack>
-        <PackagePath>lib\net9.0\</PackagePath>
+        <PackagePath>lib\net9.0</PackagePath>
       </None>
     </ItemGroup>
 
