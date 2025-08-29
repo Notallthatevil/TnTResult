@@ -119,12 +119,12 @@ internal readonly struct InternalTnTResult<TSuccess> : ITnTResult<TSuccess> {
     }
 
     /// <inheritdoc />
-    public bool TryGetValue(out TSuccess? value) {
+    public bool TryGetValue(out TSuccess value) {
         if (IsSuccessful) {
             value = Value;
             return true;
         }
-        value = default;
+        value = default!;
         return false;
     }
 
