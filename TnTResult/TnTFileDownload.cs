@@ -57,6 +57,7 @@ public record TnTFileDownload : IDisposable {
     ///     This class uses an internal enum to track the content type for optimal performance, avoiding repeated type checking and casting operations. It supports JSON serialization through the Data
     ///     property while providing strongly-typed access through specific properties.
     /// </remarks>
+    [JsonConverter(typeof(FileContentsJsonConverter))]
     public sealed class FileContents : IDisposable {
         private readonly object? _data;
         private readonly FileContentType _contentType;
@@ -249,6 +250,72 @@ public record TnTFileDownload : IDisposable {
             ///     Content is a URL string.
             /// </summary>
             Url = 3
+        }
+    }
+
+    public class FileContentsJsonConverter : JsonConverter<TnTFileDownload.FileContents> {
+        public override TnTFileDownload.FileContents? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+            if (reader.TokenType != JsonTokenType.StartObject) {
+                throw new JsonException();
+            }
+
+            string? type = null;
+            object? data = null;
+            while (reader.Read()) {
+                if (reader.TokenType == JsonTokenType.EndObject) {
+                    break;
+                }
+
+                if (reader.TokenType != JsonTokenType.PropertyName) {
+                    throw new JsonException();
+                }
+
+                var propName = reader.GetString();
+                reader.Read();
+                if (propName == "Type") {
+                    type = reader.GetString();
+                }
+                else if (propName == "Data") {
+                    if (type == typeof(byte[]).FullName) {
+                        data = JsonSerializer.Deserialize<byte[]>(ref reader, options);
+                    }
+                    else if (type == typeof(string).FullName) {
+                        data = reader.TokenType == JsonTokenType.Null ? null : reader.GetString();
+                    }
+                    else {
+                        data = null;
+                    }
+                }
+            }
+            if (type == typeof(byte[]).FullName) {
+                return (byte[])(data ?? Array.Empty<byte>());
+            }
+
+            if (type == typeof(string).FullName) {
+                return (string?)data ?? string.Empty;
+            }
+            return new TnTFileDownload.FileContents();
+        }
+
+        public override void Write(Utf8JsonWriter writer, TnTFileDownload.FileContents value, JsonSerializerOptions options) {
+            writer.WriteStartObject();
+            if (value.IsByteArray) {
+                writer.WriteString("Type", typeof(byte[]).FullName);
+                writer.WritePropertyName("Data");
+                JsonSerializer.Serialize(writer, value.ByteArray, options);
+            }
+            else if (value.IsUrl) {
+                writer.WriteString("Type", typeof(string).FullName);
+                writer.WritePropertyName("Data");
+                writer.WriteStringValue(value.Url);
+            }
+            else {
+                writer.WritePropertyName("Type");
+                writer.WriteNullValue();
+                writer.WritePropertyName("Data");
+                writer.WriteNullValue();
+            }
+            writer.WriteEndObject();
         }
     }
 }

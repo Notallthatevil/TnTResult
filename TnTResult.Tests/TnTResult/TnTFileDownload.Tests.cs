@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TnTResult;
 
 namespace TnTResult_Tests;
@@ -132,5 +134,74 @@ public class TnTFileDownloadTests {
         TnTFileDownload.FileContents fc2 = "url";
         fc2.Dispose();
         fc2.Dispose(); // Should not throw
+    }
+
+    [Fact]
+    public void TnTFileDownload_Json_SerializeDeserialize_ByteArray()
+    {
+        // Arrange
+        var original = new TnTFileDownload
+        {
+            Filename = "file.bin",
+            ContentType = "application/octet-stream",
+            Contents = new byte[] { 1, 2, 3, 4 }
+        };
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Act
+        var json = JsonSerializer.Serialize(original, options);
+        var deserialized = JsonSerializer.Deserialize<TnTFileDownload>(json, options)!;
+
+        // Assert
+        deserialized.Filename.Should().Be(original.Filename);
+        deserialized.ContentType.Should().Be(original.ContentType);
+        deserialized.Contents.IsByteArray.Should().BeTrue();
+        deserialized.Contents.ByteArray.Should().BeEquivalentTo(original.Contents.ByteArray);
+    }
+
+    [Fact]
+    public void TnTFileDownload_Json_SerializeDeserialize_Url()
+    {
+        // Arrange
+        var original = new TnTFileDownload
+        {
+            Filename = "file.txt",
+            ContentType = "text/plain",
+            Contents = "https://example.com/file.txt"
+        };
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Act
+        var json = JsonSerializer.Serialize(original, options);
+        var deserialized = JsonSerializer.Deserialize<TnTFileDownload>(json, options)!;
+
+        // Assert
+        deserialized.Filename.Should().Be(original.Filename);
+        deserialized.ContentType.Should().Be(original.ContentType);
+        deserialized.Contents.IsUrl.Should().BeTrue();
+        deserialized.Contents.Url.Should().Be(original.Contents.Url);
+    }
+
+    [Fact]
+    public void TnTFileDownload_Json_SerializeDeserialize_EmptyByteArray()
+    {
+        // Arrange
+        var original = new TnTFileDownload
+        {
+            Filename = "empty.bin",
+            ContentType = "application/octet-stream",
+            Contents = Array.Empty<byte>()
+        };
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Act
+        var json = JsonSerializer.Serialize(original, options);
+        var deserialized = JsonSerializer.Deserialize<TnTFileDownload>(json, options)!;
+
+        // Assert
+        deserialized.Filename.Should().Be(original.Filename);
+        deserialized.ContentType.Should().Be(original.ContentType);
+        deserialized.Contents.IsByteArray.Should().BeTrue();
+        deserialized.Contents.ByteArray.Should().BeEquivalentTo(Array.Empty<byte>());
     }
 }
