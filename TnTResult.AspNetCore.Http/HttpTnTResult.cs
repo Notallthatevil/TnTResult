@@ -72,6 +72,7 @@ public sealed class HttpTnTResult : ITnTResult, IHttpTnTResult {
     ///     Initializes a new instance of the <see cref="HttpTnTResult" /> class with the specified error.
     /// </summary>
     /// <param name="error">The error that occurred.</param>
+    /// <param name="result">Optional explicit <see cref="IResult" /> to wrap; if null a default error mapping is generated.</param>
     private HttpTnTResult(Exception error, IResult? result = null) {
         ArgumentNullException.ThrowIfNull(error, nameof(error));
         _error = Optional.MakeOptional(error);
@@ -528,12 +529,12 @@ public sealed class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResu
     /// </summary>
     /// <param name="value">When this method returns, contains the success value if the result is successful; otherwise, the default value for the type.</param>
     /// <returns><c>true</c> if the result is successful and contains a value; otherwise, <c>false</c>.</returns>
-    public bool TryGetValue(out TSuccess? value) {
+    public bool TryGetValue(out TSuccess value) {
         if (IsSuccessful) {
             value = Value;
             return true;
         }
-        value = default;
+        value = default!; // Default value when unsuccessful (may be null for reference types)
         return false;
     }
 

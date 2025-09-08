@@ -260,10 +260,10 @@ public static class IResultExt {
     }
 
     /// <summary>
-    ///     Converts a <see cref="Task{ITnTResult}}" /> to an <see cref="IResult" /> asynchronously with proper async/await patterns.
+    ///     Converts a task producing an <see cref="ITnTResult{TSuccess}" /> to an <see cref="IResult" /> asynchronously with proper async/await patterns.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-    /// <param name="task">             The <see cref="Task{ITnTResult{TSuccess}}" /> to convert.</param>
+    /// <param name="task">             The Task producing the <see cref="ITnTResult{TSuccess}" /> to convert.</param>
     /// <param name="uri">              The optional URI to include in the result. Required for redirect status codes.</param>
     /// <param name="successStatusCode">The success status code to use in the result. Defaults to <see cref="HttpStatusCode.OK" />.</param>
     /// <returns>A <see cref="Task{IResult}" /> that represents the asynchronous conversion operation.</returns>
@@ -286,9 +286,9 @@ public static class IResultExt {
     }
 
     /// <summary>
-    ///     Converts a <see cref="Task{ITnTResult{Stream}}" /> to an <see cref="IResult" /> asynchronously for file streaming scenarios.
+    ///     Converts a task producing an <see cref="ITnTResult{Stream}" /> to an <see cref="IResult" /> asynchronously for file streaming scenarios.
     /// </summary>
-    /// <param name="task">            The <see cref="Task{ITnTResult{Stream}}" /> to convert.</param>
+    /// <param name="task">            The Task producing the <see cref="ITnTResult{Stream}" /> to convert.</param>
     /// <param name="contentType">     The MIME content type of the stream (e.g., "application/pdf", "image/jpeg", "text/plain").</param>
     /// <param name="fileDownloadName">The suggested filename for download. This will be used in the Content-Disposition header.</param>
     /// <returns>A <see cref="Task{IResult}" /> that represents the asynchronous conversion operation.</returns>
@@ -308,9 +308,9 @@ public static class IResultExt {
     }
 
     /// <summary>
-    ///     Converts a <see cref="Task{ITnTResult{TnTFileDownload}}" /> to an <see cref="IResult" /> asynchronously with automatic content handling.
+    ///     Converts a task producing an <see cref="ITnTResult{TnTFileDownload}" /> to an <see cref="IResult" /> asynchronously with automatic content handling.
     /// </summary>
-    /// <param name="task">The <see cref="Task{ITnTResult{TnTFileDownload}}" /> to convert.</param>
+    /// <param name="task">The Task producing the <see cref="ITnTResult{TnTFileDownload}" /> to convert.</param>
     /// <returns>A <see cref="Task{IResult}" /> that represents the asynchronous conversion operation.</returns>
     /// <remarks>
     ///     <para>This method waits for the task to complete and then handles different types of file content sources automatically. Uses ConfigureAwait(false) for optimal library performance.</para>
