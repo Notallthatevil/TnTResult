@@ -10,7 +10,7 @@ public class TnTResultExtTests {
         var ex = new InvalidOperationException("fail");
         var result = global::TnTResult.TnTResult.Failure(ex);
         Exception? captured = null;
-        var r = await Task.FromResult(result).OnFailureAsync(e => captured = e);
+        var r = await Task.FromResult(result).OnFailureAsync(e => captured = e, TestContext.Current.CancellationToken);
         captured.Should().Be(ex);
         r.Should().Be(result);
     }
@@ -20,7 +20,7 @@ public class TnTResultExtTests {
         var ex = new Exception("fail");
         var result = global::TnTResult.TnTResult.Failure(ex);
         var called = false;
-        var r = await Task.FromResult(result).OnFailureAsync(async e => { called = true; await Task.Yield(); });
+        var r = await Task.FromResult(result).OnFailureAsync(async e => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -29,7 +29,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_Task_Action_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        var r = await Task.FromResult(result).OnSuccessAsync(() => called = true);
+        var r = await Task.FromResult(result).OnSuccessAsync(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -38,7 +38,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_Task_Func_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        var r = await Task.FromResult(result).OnSuccessAsync(async () => { called = true; await Task.Yield(); });
+        var r = await Task.FromResult(result).OnSuccessAsync(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -48,7 +48,7 @@ public class TnTResultExtTests {
         var ex = new InvalidOperationException("fail");
         var result = global::TnTResult.TnTResult.Failure(ex);
         Exception? captured = null;
-        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnFailureAsync(e => captured = e);
+        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnFailureAsync(e => captured = e, TestContext.Current.CancellationToken);
         captured.Should().Be(ex);
         r.Should().Be(result);
     }
@@ -58,7 +58,7 @@ public class TnTResultExtTests {
         var ex = new Exception("fail");
         var result = global::TnTResult.TnTResult.Failure(ex);
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnFailureAsync(async e => { called = true; await Task.Yield(); });
+        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnFailureAsync(async e => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -68,7 +68,7 @@ public class TnTResultExtTests {
         var ex = new InvalidOperationException("fail");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
         Exception? captured = null;
-        var r = await Task.FromResult(result).OnFailureAsync<string>(e => captured = e);
+        var r = await Task.FromResult(result).OnFailureAsync<string>(e => captured = e, TestContext.Current.CancellationToken);
         captured.Should().Be(ex);
         r.Should().Be(result);
     }
@@ -78,7 +78,7 @@ public class TnTResultExtTests {
         var ex = new InvalidOperationException("fail");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
         Exception? captured = null;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnFailureAsync<string>(e => captured = e);
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnFailureAsync<string>(e => captured = e, TestContext.Current.CancellationToken);
         captured.Should().Be(ex);
         r.Should().Be(result);
     }
@@ -88,7 +88,7 @@ public class TnTResultExtTests {
         var ex = new Exception("fail");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
         var called = false;
-        var r = await Task.FromResult(result).OnFailureAsync<string>(async e => { called = true; await Task.Yield(); });
+        var r = await Task.FromResult(result).OnFailureAsync<string>(async e => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -98,7 +98,7 @@ public class TnTResultExtTests {
         var ex = new Exception("fail");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnFailureAsync<string>(async e => { called = true; await Task.Yield(); });
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnFailureAsync<string>(async e => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -107,7 +107,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTask_Action_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnSuccessAsync(() => called = true);
+        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnSuccessAsync(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -116,7 +116,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTask_Func_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnSuccessAsync(async () => { called = true; await Task.Yield(); });
+        var r = await new ValueTask<global::TnTResult.ITnTResult>(result).OnSuccessAsync(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -125,7 +125,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_TaskT_Action_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        var r = await Task.FromResult(result).OnSuccessAsync<string>(() => called = true);
+        var r = await Task.FromResult(result).OnSuccessAsync<string>(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -134,7 +134,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTaskT_Action_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(() => called = true);
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -143,7 +143,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_TaskT_Func_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        var r = await Task.FromResult(result).OnSuccessAsync<string>(async () => { called = true; await Task.Yield(); });
+        var r = await Task.FromResult(result).OnSuccessAsync<string>(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -152,7 +152,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTaskT_Func_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(async () => { called = true; await Task.Yield(); });
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
         r.Should().Be(result);
     }
@@ -161,7 +161,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_TaskT_ActionT_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         string? value = null;
-        var r = await Task.FromResult(result).OnSuccessAsync<string>(v => value = v);
+        var r = await Task.FromResult(result).OnSuccessAsync<string>(v => value = v); // No token
         value.Should().Be("ok");
         r.Should().Be(result);
     }
@@ -170,7 +170,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTaskT_ActionT_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         string? value = null;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(v => value = v);
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(v => value = v); // No token
         value.Should().Be("ok");
         r.Should().Be(result);
     }
@@ -179,7 +179,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_TaskT_FuncT_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         string? value = null;
-        var r = await Task.FromResult(result).OnSuccessAsync<string>(async v => { value = v; await Task.Yield(); });
+        var r = await Task.FromResult(result).OnSuccessAsync<string>(async v => { value = v; await Task.Yield(); }); // No token
         value.Should().Be("ok");
         r.Should().Be(result);
     }
@@ -188,7 +188,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_ValueTaskT_FuncT_CalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Success("ok");
         string? value = null;
-        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(async v => { value = v; await Task.Yield(); });
+        var r = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).OnSuccessAsync<string>(async v => { value = v; await Task.Yield(); }); // No token
         value.Should().Be("ok");
         r.Should().Be(result);
     }
@@ -198,7 +198,7 @@ public class TnTResultExtTests {
     {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -208,7 +208,7 @@ public class TnTResultExtTests {
         var ex = new Exception("fail");
         var result = global::TnTResult.TnTResult.Failure(ex);
         var called = false;
-        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        await Task.FromResult(result).FinallyAsync(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -217,7 +217,7 @@ public class TnTResultExtTests {
     {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        await new ValueTask<global::TnTResult.ITnTResult>(result).FinallyAsync(async () => { called = true; await Task.Yield(); });
+        await new ValueTask<global::TnTResult.ITnTResult>(result).FinallyAsync(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -226,7 +226,7 @@ public class TnTResultExtTests {
     {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        await Task.FromResult(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); });
+        await Task.FromResult(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -235,7 +235,7 @@ public class TnTResultExtTests {
     {
         var result = global::TnTResult.TnTResult.Success("ok");
         var called = false;
-        await new ValueTask<global::TnTResult.ITnTResult<string>>(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); });
+        await new ValueTask<global::TnTResult.ITnTResult<string>>(result).FinallyAsync<string>(async () => { called = true; await Task.Yield(); }, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -245,7 +245,7 @@ public class TnTResultExtTests {
     public async Task OnFailureAsync_Task_Action_NotCalledOnSuccess() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        var r = await Task.FromResult(result).OnFailureAsync(_ => called = true);
+        var r = await Task.FromResult(result).OnFailureAsync(_ => called = true, TestContext.Current.CancellationToken);
         called.Should().BeFalse();
         r.Should().Be(result);
     }
@@ -254,7 +254,7 @@ public class TnTResultExtTests {
     public async Task OnSuccessAsync_Task_Action_NotCalledOnFailure() {
         var result = global::TnTResult.TnTResult.Failure(new InvalidOperationException("fail"));
         var called = false;
-        var r = await Task.FromResult(result).OnSuccessAsync(() => called = true);
+        var r = await Task.FromResult(result).OnSuccessAsync(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeFalse();
         r.Should().Be(result);
     }
@@ -362,7 +362,7 @@ public class TnTResultExtTests {
     [Fact]
     public async Task ThrowOnFailureAsync_Task_NonGeneric_Success_ReturnsSameInstance() {
         var result = global::TnTResult.TnTResult.Successful;
-        var returned = await Task.FromResult(result).ThrowOnFailureAsync();
+        var returned = await Task.FromResult(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken);
         returned.Should().Be(result);
     }
 
@@ -370,21 +370,21 @@ public class TnTResultExtTests {
     public async Task ThrowOnFailureAsync_Task_NonGeneric_Failure_ThrowsOriginal() {
         var ex = new InvalidOperationException("boom");
         var result = global::TnTResult.TnTResult.Failure(ex);
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => Task.FromResult(result).ThrowOnFailureAsync());
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => Task.FromResult(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken));
         thrown.Should().BeSameAs(ex);
     }
 
     [Fact]
     public async Task ThrowOnFailureAsync_Task_NonGeneric_Failure_ThrowsCustom() {
         var result = global::TnTResult.TnTResult.Failure(new Exception("e"));
-        var thrown = await Assert.ThrowsAsync<ApplicationException>(() => Task.FromResult(result).ThrowOnFailureAsync(() => new ApplicationException("c")));
+        var thrown = await Assert.ThrowsAsync<ApplicationException>(() => Task.FromResult(result).ThrowOnFailureAsync(() => new ApplicationException("c"), TestContext.Current.CancellationToken));
         thrown.Message.Should().Be("c");
     }
 
     [Fact]
     public async Task ThrowOnFailureAsync_Task_Generic_Success_ReturnsSameInstance() {
         var result = global::TnTResult.TnTResult.Success("v");
-        var returned = await Task.FromResult(result).ThrowOnFailureAsync();
+        var returned = await Task.FromResult(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken);
         returned.Should().Be(result);
     }
 
@@ -392,21 +392,21 @@ public class TnTResultExtTests {
     public async Task ThrowOnFailureAsync_Task_Generic_Failure_ThrowsOriginal() {
         var ex = new InvalidOperationException("boom");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => Task.FromResult(result).ThrowOnFailureAsync());
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => Task.FromResult(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken));
         thrown.Should().BeSameAs(ex);
     }
 
     [Fact]
     public async Task ThrowOnFailureAsync_Task_Generic_Failure_ThrowsCustom() {
         var result = global::TnTResult.TnTResult.Failure<string>(new Exception("e"));
-        var thrown = await Assert.ThrowsAsync<ApplicationException>(() => Task.FromResult(result).ThrowOnFailureAsync(() => new ApplicationException("c")));
+        var thrown = await Assert.ThrowsAsync<ApplicationException>(() => Task.FromResult(result).ThrowOnFailureAsync(() => new ApplicationException("c"), TestContext.Current.CancellationToken));
         thrown.Message.Should().Be("c");
     }
 
     [Fact]
     public async Task ThrowOnFailureAsync_ValueTask_NonGeneric_Success_ReturnsSameInstance() {
         var result = global::TnTResult.TnTResult.Successful;
-        var returned = await new ValueTask<global::TnTResult.ITnTResult>(result).ThrowOnFailureAsync();
+        var returned = await new ValueTask<global::TnTResult.ITnTResult>(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken);
         returned.Should().Be(result);
     }
 
@@ -414,14 +414,14 @@ public class TnTResultExtTests {
     public async Task ThrowOnFailureAsync_ValueTask_NonGeneric_Failure_ThrowsOriginal() {
         var ex = new InvalidOperationException("boom");
         var result = global::TnTResult.TnTResult.Failure(ex);
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => new ValueTask<global::TnTResult.ITnTResult>(result).ThrowOnFailureAsync().AsTask());
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => new ValueTask<global::TnTResult.ITnTResult>(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken).AsTask());
         thrown.Should().BeSameAs(ex);
     }
 
     [Fact]
     public async Task ThrowOnFailureAsync_ValueTask_Generic_Success_ReturnsSameInstance() {
         var result = global::TnTResult.TnTResult.Success("v");
-        var returned = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).ThrowOnFailureAsync();
+        var returned = await new ValueTask<global::TnTResult.ITnTResult<string>>(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken);
         returned.Should().Be(result);
     }
 
@@ -429,7 +429,7 @@ public class TnTResultExtTests {
     public async Task ThrowOnFailureAsync_ValueTask_Generic_Failure_ThrowsOriginal() {
         var ex = new InvalidOperationException("boom");
         var result = global::TnTResult.TnTResult.Failure<string>(ex);
-        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => new ValueTask<global::TnTResult.ITnTResult<string>>(result).ThrowOnFailureAsync().AsTask());
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => new ValueTask<global::TnTResult.ITnTResult<string>>(result).ThrowOnFailureAsync(TestContext.Current.CancellationToken).AsTask());
         thrown.Should().BeSameAs(ex);
     }
 
@@ -437,7 +437,7 @@ public class TnTResultExtTests {
     public async Task FinallyAsync_Task_Action_Called() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        await Task.FromResult(result).FinallyAsync(() => called = true);
+        await Task.FromResult(result).FinallyAsync(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -445,7 +445,7 @@ public class TnTResultExtTests {
     public async Task FinallyAsync_ValueTask_Action_Called() {
         var result = global::TnTResult.TnTResult.Successful;
         var called = false;
-        await new ValueTask<global::TnTResult.ITnTResult>(result).FinallyAsync(() => called = true);
+        await new ValueTask<global::TnTResult.ITnTResult>(result).FinallyAsync(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -453,7 +453,7 @@ public class TnTResultExtTests {
     public async Task FinallyAsync_TaskT_Action_Called() {
         var result = global::TnTResult.TnTResult.Success("v");
         var called = false;
-        await Task.FromResult(result).FinallyAsync<string>(() => called = true);
+        await Task.FromResult(result).FinallyAsync<string>(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
@@ -461,7 +461,7 @@ public class TnTResultExtTests {
     public async Task FinallyAsync_ValueTaskT_Action_Called() {
         var result = global::TnTResult.TnTResult.Success("v");
         var called = false;
-        await new ValueTask<global::TnTResult.ITnTResult<string>>(result).FinallyAsync<string>(() => called = true);
+        await new ValueTask<global::TnTResult.ITnTResult<string>>(result).FinallyAsync<string>(() => called = true, TestContext.Current.CancellationToken);
         called.Should().BeTrue();
     }
 
