@@ -102,13 +102,40 @@ public static class IApiResponseExt {
         }
     }
 
-    /// <summary> Converts a typed <see cref="IApiResponse{TSuccess}"/> into an <see cref="ITnTResult{TSuccess}"/>. </summary> <typeparam name="TSuccess">The expected success value type.</typeparam>
-    /// <param name="apiResponse">The typed API response. If <c>null</c>, a failed result is returned.</param> <returns>A successful result containing the deserialized content (or special Location
-    /// handling) or a failed result with an error.</returns> <remarks> Special handling: <list type="bullet"> <item><description>201 Created + Location header + <typeparamref name="TSuccess"/> ==
-    /// <see cref="string"/>: returns the Location URI string.</description></item> <item><description>Redirect (301/302/307) + Location header + <typeparamref name="TSuccess"/> is <see
-    /// cref="string"/> or <see cref="Uri"/>: returns Location value.</description></item> <item><description>Errors attempt RFC 7807 parsing before falling back to content / reason
-    /// phrase.</description></item> </list> </remarks> <example> <code> IApiResponse<User> response = await api.GetUser(id); ITnTResult<User> result = response.ToTnTResult(); if (result.IsSuccessful)
-    /// Console.WriteLine(result.Value.Name); </code> </example>
+    /// <summary>
+    ///     Converts a typed <see cref="IApiResponse{TSuccess}" /> into an <see cref="ITnTResult{TSuccess}" />.
+    /// </summary>
+    /// <typeparam name="TSuccess">The expected success value type.</typeparam>
+    /// <param name="apiResponse">The typed API response. If <c>null</c>, a failed result is returned.</param>
+    /// <returns>A successful result containing the deserialized content (including special Location header handling) or a failed result with an error.</returns>
+    /// <remarks>
+    ///     <para>Special handling includes:</para>
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>201 Created + Location header + <typeparamref name="TSuccess" /> is <see cref="string" /> ⇒ returns Location URI string.</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>301/302/307 redirect + Location header + <typeparamref name="TSuccess" /> is <see cref="string" /> or <see cref="Uri" /> ⇒ returns Location value.</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Error responses attempt RFC 7807 (problem+json) parsing before falling back to content or reason phrase.</description>
+    ///         </item>
+    ///     </list>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///IApiResponse&lt;User&gt; response = await api.GetUser(id);
+    ///ITnTResult&lt;User&gt; result = response.ToTnTResult();
+    ///if (result.IsSuccessful)
+    ///{
+    ///Console.WriteLine(result.Value.Name);
+    ///}
+    ///else
+    ///{
+    ///Console.WriteLine(result.ErrorMessage);
+    ///}
+    ///     </code>
+    /// </example>
     public static ITnTResult<TSuccess> ToTnTResult<TSuccess>(this IApiResponse<TSuccess> apiResponse) {
         if (apiResponse is null) {
             return TnTResult.Failure<TSuccess>(new Exception("Failed with empty response from the server"));
