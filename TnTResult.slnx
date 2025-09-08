@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/PublishToNuget.yml" />
+    <File Path="Logo.png" />
+  </Folder>
+  <Project Path="TnTResult.AspNetCore.Http/TnTResult.AspNetCore.Http.csproj" />
+  <Project Path="TnTResult.Refit/TnTResult.Refit.csproj" />
+  <Project Path="TnTResult.Tests/TnTResult.Tests.csproj" />
+  <Project Path="TnTResult/TnTResult.csproj" />
+</Solution>
