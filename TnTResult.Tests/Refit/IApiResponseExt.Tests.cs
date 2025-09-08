@@ -281,4 +281,91 @@ public class IApiResponseExtTests {
         result.IsSuccessful.Should().BeTrue();
         result.Value.Should().Be("ok");
     }
+
+    // New tests for IApiResponse<TnTFileDownload> overload
+
+    [Fact]
+    public void ToTnTResult_TnTFileDownload_ReturnsSuccess_WithByteArrayContents() {
+        // Arrange
+        var file = new TnTResult.TnTFileDownload {
+            Filename = "test.bin",
+            ContentType = "application/octet-stream",
+            Contents = new byte[] { 1, 2, 3 }
+        };
+        var mockResponse = Substitute.For<IApiResponse<TnTResult.TnTFileDownload>>();
+        mockResponse.IsSuccessStatusCode.Returns(true);
+        mockResponse.Content.Returns(file);
+
+        // Act
+        var result = mockResponse.ToTnTResult();
+
+        // Assert
+        result.IsSuccessful.Should().BeTrue();
+        result.Value.Should().BeSameAs(file);
+    }
+
+    [Fact]
+    public void ToTnTResult_TnTFileDownload_Throws_WhenContentsIsStream() {
+        // Arrange
+        var stream = new MemoryStream(new byte[] { 4, 5, 6 });
+        var file = new TnTResult.TnTFileDownload {
+            Filename = "stream.bin",
+            ContentType = "application/octet-stream",
+            Contents = stream // implicit conversion to FileContents (IsStream = true)
+        };
+        var mockResponse = Substitute.For<IApiResponse<TnTResult.TnTFileDownload>>();
+        mockResponse.IsSuccessStatusCode.Returns(true);
+        mockResponse.Content.Returns(file);
+
+        // Act
+        Action act = () => mockResponse.ToTnTResult();
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Use the IApiResponse<Stream> overload instead.*");
+    }
+
+    [Fact]
+    public void ToTnTResult_TnTFileDownload_ReturnsFailure_WhenContentNull() {
+        // Arrange
+        var mockResponse = Substitute.For<IApiResponse<TnTResult.TnTFileDownload>>();
+        mockResponse.IsSuccessStatusCode.Returns(true);
+        mockResponse.Content.Returns((TnTResult.TnTFileDownload)null!);
+
+        // Act
+        var result = mockResponse.ToTnTResult();
+
+        // Assert
+        result.HasFailed.Should().BeTrue();
+        result.Error.Message.Should().Contain("No content in the response");
+    }
+
+    [Fact]
+    public async Task ToTnTResult_TnTFileDownload_ReturnsFailure_OnErrorStatusCode() {
+        // Arrange
+        var mockResponse = Substitute.For<IApiResponse<TnTResult.TnTFileDownload>>();
+        mockResponse.IsSuccessStatusCode.Returns(false);
+        mockResponse.StatusCode.Returns(HttpStatusCode.BadRequest);
+        var request = new HttpRequestMessage(HttpMethod.Get, "http://test/file");
+        var response = new HttpResponseMessage(HttpStatusCode.BadRequest) {
+            Content = new StringContent("file error")
+        };
+        var apiEx = await ApiException.Create(
+            "file error",
+            request,
+            HttpMethod.Get,
+            response,
+            new RefitSettings(),
+            null
+        );
+        mockResponse.Error.Returns(apiEx);
+
+        // Act
+        var result = mockResponse.ToTnTResult();
+
+        // Assert
+        result.HasFailed.Should().BeTrue();
+        // The current implementation falls back to status code text rather than the error content for this scenario
+        result.Error.Message.Should().Contain("BadRequest");
+    }
 }

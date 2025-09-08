@@ -221,7 +221,7 @@ public static class IResultExt {
 
         return fileDownload.Contents switch {
             { IsStream: true } when fileDownload.Contents.Stream is not null => CreateFileStreamResult(fileDownload.Contents.Stream, fileDownload.ContentType, fileDownload.Filename),
-            { IsUrl: true } => TypedResults.Text(fileDownload.Contents.Url!),
+            { IsUrl: true } => TypedResults.Ok(fileDownload),
             { IsByteArray: true } when fileDownload.Contents.ByteArray is not null => TypedResults.File(fileDownload.Contents.ByteArray, fileDownload.ContentType, fileDownload.Filename),
             _ => TypedResults.NoContent()
         };
@@ -260,7 +260,7 @@ public static class IResultExt {
     }
 
     /// <summary>
-    ///     Converts a <see cref="Task{ITnTResult{TSuccess}}" /> to an <see cref="IResult" /> asynchronously with proper async/await patterns.
+    ///     Converts a <see cref="Task{ITnTResult}}" /> to an <see cref="IResult" /> asynchronously with proper async/await patterns.
     /// </summary>
     /// <typeparam name="TSuccess">The type of the success value.</typeparam>
     /// <param name="task">             The <see cref="Task{ITnTResult{TSuccess}}" /> to convert.</param>
