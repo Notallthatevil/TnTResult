@@ -65,7 +65,11 @@ internal class ProblemDetails {
 ///             <description>Graceful handling of cancellation ( <see cref="OperationCanceledException" />) in async variants</description>
 ///         </item>
 ///     </list>
-///     <para>All overloads dispose the underlying <see cref="IApiResponse" /> (via <c>using</c>).</para>
+///     <para>
+///         Most overloads dispose the underlying <see cref="IApiResponse" /> immediately (via <c>using</c>).
+///         However, when the content type implements <see cref="IDisposable" />, the <see cref="IApiResponse" /> is NOT disposed automatically,
+///         and the caller is responsible for disposing both the content and the response.
+///     </para>
 /// </remarks>
 public static class IApiResponseExt {
     private const string ProblemJsonContentType = "application/problem+json";
@@ -120,6 +124,9 @@ public static class IApiResponseExt {
     ///         <item>
     ///             <description>Error responses attempt RFC 7807 (problem+json) parsing before falling back to content or reason phrase.</description>
     ///         </item>
+    ///         <item>
+    ///             <description>When content is <see cref="IDisposable"/>, the response is NOT disposed automatically - the caller owns the lifecycle.</description>
+    ///         </item>
     ///     </list>
     /// </remarks>
     /// <example>
@@ -140,7 +147,13 @@ public static class IApiResponseExt {
         if (apiResponse is null) {
             return TnTResult.Failure<TSuccess>(new Exception("Failed with empty response from the server"));
         }
-        using (apiResponse) {
+
+        // Determine if we should dispose the response
+        // Only skip disposal if content is disposable AND we're returning it successfully
+        var contentIsDisposable = typeof(IDisposable).IsAssignableFrom(typeof(TSuccess));
+        var shouldDispose = true;
+        
+        try {
             if (apiResponse.IsSuccessStatusCode) {
                 // Handle special case for Created status with Location header
                 if (apiResponse.StatusCode == HttpStatusCode.Created &&
@@ -162,10 +175,17 @@ public static class IApiResponseExt {
                     }
                 }
 
+                // If content is disposable, don't dispose the response - caller owns it
+                shouldDispose = !contentIsDisposable;
                 return TnTResult.Success(apiResponse.Content!);
             }
             else {
                 return HandleErrorResponse<TSuccess>(apiResponse);
+            }
+        }
+        finally {
+            if (shouldDispose) {
+                apiResponse.Dispose();
             }
         }
     }
@@ -190,25 +210,32 @@ public static class IApiResponseExt {
         if (apiResponse is null) {
             return TnTResult.Failure<TnTFileDownload>(new Exception("Failed with empty response from the server"));
         }
-        using (apiResponse) {
-            if (apiResponse.IsSuccessStatusCode) {
-                if (apiResponse.Content is null) {
+        if (apiResponse.IsSuccessStatusCode) {
+            if (apiResponse.Content is null) {
+                // Dispose the response since we're returning an error and TnTFileDownload won't take ownership
+                using (apiResponse) {
                     return TnTResult.Failure<TnTFileDownload>(new Exception("No content in the response"));
                 }
-
-                var filename = apiResponse.ContentHeaders?.ContentDisposition?.FileNameStar ??
-                    apiResponse.ContentHeaders?.ContentDisposition?.FileName ??
-                    "download";
-
-                var contentType = apiResponse.ContentHeaders?.ContentType?.MediaType ?? "application/octet-stream";
-
-                return TnTResult.Success(new TnTFileDownload {
-                    Contents = apiResponse.Content!,
-                    Filename = filename,
-                    ContentType = contentType
-                });
             }
-            else {
+
+            var filename = apiResponse.ContentHeaders?.ContentDisposition?.FileNameStar ??
+                apiResponse.ContentHeaders?.ContentDisposition?.FileName ??
+                "download";
+
+            var contentType = apiResponse.ContentHeaders?.ContentType?.MediaType ?? "application/octet-stream";
+
+            // Note: We do NOT dispose apiResponse here because TnTFileDownload takes ownership
+            // through DisposableContent and will dispose it when the TnTFileDownload is disposed
+            return TnTResult.Success(new TnTFileDownload {
+                Contents = apiResponse.Content!,
+                Filename = filename,
+                ContentType = contentType,
+                DisposableContent = apiResponse
+            });
+        }
+        else {
+            // On error, we need to dispose the response since TnTFileDownload won't take ownership
+            using (apiResponse) {
                 return HandleErrorResponse<TnTFileDownload>(apiResponse);
             }
         }

@@ -29,6 +29,11 @@ public record TnTFileDownload : IDisposable {
     /// <value>A <see cref="FileContents" /> instance containing the actual file data.</value>
     public required FileContents Contents { get; init; }
 
+    /// <summary>
+    ///     Gets the disposable content associated with this instance.
+    /// </summary>
+    internal IDisposable? DisposableContent { get; init; }
+
     private bool _disposed;
 
     /// <summary>
@@ -46,8 +51,9 @@ public record TnTFileDownload : IDisposable {
     /// <param name="disposing"><see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing) {
         if (!_disposed && disposing) {
-            Contents?.Dispose();
             _disposed = true;
+            Contents?.Dispose();
+            DisposableContent?.Dispose();
         }
     }
     /// <summary>

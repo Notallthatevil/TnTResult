@@ -48,7 +48,6 @@
 
     <ItemGroup>
         <Folder Include="AspNetCore.Http\" />
-        <Folder Include="Refit\" />
     </ItemGroup>
 
 </Project>
