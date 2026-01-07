@@ -44,13 +44,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="bin\$(Configuration)\net10.0\TnTResult.Refit.xml">
-			<Pack>True</Pack>
-			<PackagePath>lib\net10.0</PackagePath>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Refit" Version="9.0.2" />
 	</ItemGroup>
 
