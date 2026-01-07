@@ -1,89 +1,69 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <Title>TnTResult.Refit</Title>
-        <Description>Refit integration for TnTResult, enabling functional result types in Refit-based HTTP clients for .NET.</Description>
-        <PackageTags>refit;httpclient;result;functional;dotnet;api;integration;NTTechnologies;C#;open-source;rest;client;extension;error-handling;core</PackageTags>
-        <Authors>NT Technologies</Authors>
-        <Company>NT Technologies</Company>
-        <PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Title>TnTResult.Refit</Title>
+		<Description>Refit integration for TnTResult, enabling functional result types in Refit-based HTTP clients for .NET.</Description>
+		<PackageTags>refit;httpclient;result;functional;dotnet;api;integration;NTTechnologies;C#;open-source;rest;client;extension;error-handling;core</PackageTags>
+		<Authors>NT Technologies</Authors>
+		<Company>NT Technologies</Company>
+		<PackageProjectUrl>https://github.com/Notallthatevil/TnTResult</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Notallthatevil/TnTResult</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<PackageIcon>Logo.png</PackageIcon>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>1591</NoWarn>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright © NT Technologies 2025</Copyright>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
-        <PackageIcon>Logo.png</PackageIcon>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>1591</NoWarn>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryType>git</RepositoryType>
-        <Copyright>Copyright © NT Technologies 2025</Copyright>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    </PropertyGroup>
+	<ItemGroup>
+		<None Include="Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
+	<Target Name="CopyLogoForNuget" BeforeTargets="PrepareForBuild">
+		<Copy SourceFiles="$(SolutionDir)Logo.png" DestinationFolder="$(MSBuildThisFileDirectory)" SkipUnchangedFiles="true" />
+	</Target>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
+	<ItemGroup>
+		<None Include="bin\$(Configuration)\net8.0\TnTResult.Refit.xml">
+			<Pack>True</Pack>
+			<PackagePath>lib\net8.0</PackagePath>
+		</None>
+		<None Include="bin\$(Configuration)\net9.0\TnTResult.Refit.xml">
+			<Pack>True</Pack>
+			<PackagePath>lib\net9.0</PackagePath>
+		</None>
+		<None Include="bin\$(Configuration)\net10.0\TnTResult.Refit.xml">
+			<Pack>True</Pack>
+			<PackagePath>lib\net10.0</PackagePath>
+		</None>
+	</ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Refit" Version="9.0.2" />
+	</ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|AnyCPU'">
-      <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="Logo.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
-  <Target Name="CopyLogoForNuget" BeforeTargets="PrepareForBuild">
-    <Copy SourceFiles="$(SolutionDir)Logo.png" DestinationFolder="$(MSBuildThisFileDirectory)" SkipUnchangedFiles="true" />
-  </Target>
-
-    <ItemGroup>
-      <None Include="..\README.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="bin\$(Configuration)\net8.0\TnTResult.Refit.xml">
-        <Pack>True</Pack>
-        <PackagePath>lib\net8.0</PackagePath>
-      </None>
-      <None Include="bin\$(Configuration)\net9.0\TnTResult.Refit.xml">
-        <Pack>True</Pack>
-        <PackagePath>lib\net9.0</PackagePath>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Refit" Version="9.0.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\TnTResult\TnTResult.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TnTResult\TnTResult.csproj" />
+	</ItemGroup>
 
 </Project>
