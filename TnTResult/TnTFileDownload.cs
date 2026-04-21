@@ -261,45 +261,34 @@ public record TnTFileDownload : IDisposable {
 
     public class FileContentsJsonConverter : JsonConverter<TnTFileDownload.FileContents> {
         public override TnTFileDownload.FileContents? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-            if (reader.TokenType != JsonTokenType.StartObject) {
+            using var document = JsonDocument.ParseValue(ref reader);
+            var root = document.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object) {
                 throw new JsonException();
             }
 
-            string? type = null;
-            object? data = null;
-            while (reader.Read()) {
-                if (reader.TokenType == JsonTokenType.EndObject) {
-                    break;
-                }
+            root.TryGetProperty("Type", out var typeProperty);
+            root.TryGetProperty("Data", out var dataProperty);
 
-                if (reader.TokenType != JsonTokenType.PropertyName) {
-                    throw new JsonException();
-                }
+            var type = typeProperty.ValueKind == JsonValueKind.String
+                ? typeProperty.GetString()
+                : null;
 
-                var propName = reader.GetString();
-                reader.Read();
-                if (propName == "Type") {
-                    type = reader.GetString();
-                }
-                else if (propName == "Data") {
-                    if (type == typeof(byte[]).FullName) {
-                        data = JsonSerializer.Deserialize<byte[]>(ref reader, options);
-                    }
-                    else if (type == typeof(string).FullName) {
-                        data = reader.TokenType == JsonTokenType.Null ? null : reader.GetString();
-                    }
-                    else {
-                        data = null;
-                    }
-                }
-            }
             if (type == typeof(byte[]).FullName) {
-                return (byte[])(data ?? Array.Empty<byte>());
+                if (dataProperty.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null) {
+                    return Array.Empty<byte>();
+                }
+
+                return JsonSerializer.Deserialize<byte[]>(dataProperty.GetRawText(), options) ?? Array.Empty<byte>();
             }
 
             if (type == typeof(string).FullName) {
-                return (string?)data ?? string.Empty;
+                return dataProperty.ValueKind == JsonValueKind.String
+                    ? dataProperty.GetString() ?? string.Empty
+                    : string.Empty;
             }
+
             return new TnTFileDownload.FileContents();
         }
 

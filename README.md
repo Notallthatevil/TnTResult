@@ -35,7 +35,7 @@ TnTResult is a .NET solution providing a set of libraries for handling result ty
   - Integrates TnTResult types with ASP.NET Core HTTP pipeline.
   - Provides helpers for controller responses and HTTP result mapping.
 - **Key Files:**
-  - `ControllerRepositoryBase.cs`, `HttpTnTResult.cs`
+  - `TnTResultControllerBase.cs`, `HttpTnTResult.cs`
   - Extensions in `Ext/`
 
 ### 3. TnTResult.Refit
@@ -60,12 +60,12 @@ TnTResult is a .NET solution providing a set of libraries for handling result ty
 
 2. **Restore dependencies:**
    ```powershell
-   dotnet restore TnTResult.sln
+   dotnet restore TnTResult.slnx
    ```
 
 3. **Build the solution:**
    ```powershell
-   dotnet build TnTResult.sln --configuration Release
+   dotnet build TnTResult.slnx --configuration Release
    ```
 
 ---
@@ -75,7 +75,7 @@ TnTResult is a .NET solution providing a set of libraries for handling result ty
 All tests are located in the `TnTResult.Tests` project. To run all tests:
 
 ```powershell
-dotnet test TnTResult.sln
+dotnet test TnTResult.slnx
 ```
 
 ---

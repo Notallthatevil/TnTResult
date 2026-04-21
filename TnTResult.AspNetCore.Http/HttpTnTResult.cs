@@ -395,26 +395,26 @@ public sealed class HttpTnTResult<TSuccess> : ITnTResult<TSuccess>, IHttpTnTResu
     /// </summary>
     /// <param name="value">The optional value to include in the response body.</param>
     /// <returns>A new <see cref="HttpTnTResult{TSuccess}" /> representing a not found error.</returns>
-    public static HttpTnTResult<TSuccess> NotFound(object? value = null) => new(new NotFoundException(value?.ToString() ?? "Resource not found"));
+    public static HttpTnTResult<TSuccess> NotFound(object? value = null) => new(new NotFoundException(value?.ToString() ?? "Resource not found"), TypedResults.NotFound(value));
 
     /// <summary>
     ///     Creates an HTTP 400 Bad Request response.
     /// </summary>
     /// <param name="error">The optional error information to include in the response.</param>
     /// <returns>A new <see cref="HttpTnTResult{TSuccess}" /> representing a bad request error.</returns>
-    public static HttpTnTResult<TSuccess> BadRequest(object? error = null) => new(new ArgumentException(error?.ToString() ?? "Bad request"));
+    public static HttpTnTResult<TSuccess> BadRequest(object? error = null) => new(new ArgumentException(error?.ToString() ?? "Bad request"), TypedResults.BadRequest(error));
 
     /// <summary>
     ///     Creates an HTTP 401 Unauthorized response.
     /// </summary>
     /// <returns>A new <see cref="HttpTnTResult{TSuccess}" /> representing an unauthorized access error.</returns>
-    public static HttpTnTResult<TSuccess> Unauthorized() => new(new UnauthorizedAccessException());
+    public static HttpTnTResult<TSuccess> Unauthorized() => new(new UnauthorizedAccessException(), TypedResults.Unauthorized());
 
     /// <summary>
     ///     Creates an HTTP 403 Forbidden response.
     /// </summary>
     /// <returns>A new <see cref="HttpTnTResult{TSuccess}" /> representing a forbidden access error.</returns>
-    public static HttpTnTResult<TSuccess> Forbid() => new(new ForbiddenException());
+    public static HttpTnTResult<TSuccess> Forbid() => new(new ForbiddenException(), TypedResults.Forbid());
 
     /// <summary>
     ///     Creates a failure result with the specified error.

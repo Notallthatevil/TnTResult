@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -90,6 +91,32 @@ public class IApiResponseExtTests {
         // Assert
         result.HasFailed.Should().BeTrue();
         result.Error.Should().BeOfType<OperationCanceledException>();
+    }
+
+    [Fact]
+    public async Task ToTnTResultAsync_ReturnsFailure_OnNullResponse() {
+        // Arrange
+        var task = Task.FromResult<IApiResponse>(null!);
+
+        // Act
+        var result = await task.ToTnTResultAsync();
+
+        // Assert
+        result.HasFailed.Should().BeTrue();
+        result.Error.Message.Should().Be("Failed with empty response from the server");
+    }
+
+    [Fact]
+    public async Task ToTnTResultAsyncT_ReturnsFailure_OnNullResponse() {
+        // Arrange
+        var task = Task.FromResult<IApiResponse<string>>(null!);
+
+        // Act
+        var result = await task.ToTnTResultAsync();
+
+        // Assert
+        result.HasFailed.Should().BeTrue();
+        result.Error.Message.Should().Be("Failed with empty response from the server");
     }
 
     [Fact]
@@ -246,6 +273,35 @@ public class IApiResponseExtTests {
         // Assert
         result.HasFailed.Should().BeTrue();
         result.Error.Message.Should().Contain("BadRequest");
+    }
+
+    [Fact]
+    public void ToTnTResultT_ParsesProblemJsonWithCharset() {
+        // Arrange
+        var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+        response.Content = new StringContent("{\"detail\":\"problem detail\"}");
+        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/problem+json");
+        response.Content.Headers.ContentType.CharSet = "utf-8";
+
+        var apiException = CreateApiException(
+            message: "problem detail",
+            content: "{\"detail\":\"problem detail\"}",
+            statusCode: HttpStatusCode.BadRequest,
+            reasonPhrase: "Bad Request");
+
+        var apiResponse = new FakeApiResponse<string> {
+            ContentHeaders = response.Content.Headers,
+            Error = apiException,
+            IsSuccessStatusCode = false,
+            StatusCode = HttpStatusCode.BadRequest
+        };
+
+        // Act
+        var result = apiResponse.ToTnTResult();
+
+        // Assert
+        result.HasFailed.Should().BeTrue();
+        result.Error.Message.Should().Be("problem detail");
     }
 
     [Fact]
@@ -810,5 +866,52 @@ public class IApiResponseExtTests {
         // Assert
         result.HasFailed.Should().BeTrue();
         responseDisposed.Should().BeTrue("IApiResponse should be disposed on error even for disposable content types");
+    }
+
+    private static ApiException CreateApiException(string message, string content, HttpStatusCode statusCode, string reasonPhrase) {
+        var constructor = typeof(ApiException).GetConstructor(
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            types: [
+                typeof(string),
+                typeof(HttpRequestMessage),
+                typeof(HttpMethod),
+                typeof(string),
+                typeof(HttpStatusCode),
+                typeof(string),
+                typeof(HttpResponseHeaders),
+                typeof(RefitSettings),
+                typeof(Exception)
+            ],
+            modifiers: null);
+
+        constructor.Should().NotBeNull();
+
+        return (ApiException)constructor!.Invoke([
+            message,
+            new HttpRequestMessage(HttpMethod.Get, "http://test/problem"),
+            HttpMethod.Get,
+            content,
+            statusCode,
+            reasonPhrase,
+            new HttpResponseMessage(statusCode).Headers,
+            new RefitSettings(),
+            null!
+        ]);
+    }
+
+    private sealed class FakeApiResponse<T> : IApiResponse<T> {
+        public HttpResponseHeaders Headers { get; init; } = new HttpResponseMessage().Headers;
+        public HttpContentHeaders ContentHeaders { get; init; } = new ByteArrayContent([]).Headers;
+        public bool IsSuccessStatusCode { get; init; }
+        public bool IsSuccessful { get; init; }
+        public HttpStatusCode StatusCode { get; init; }
+        public string ReasonPhrase { get; init; } = string.Empty;
+        public HttpRequestMessage RequestMessage { get; init; } = new(HttpMethod.Get, "http://localhost/");
+        public Version Version { get; init; } = HttpVersion.Version11;
+        public ApiException Error { get; init; } = null!;
+        public T Content { get; init; } = default!;
+
+        public void Dispose() { }
     }
 }

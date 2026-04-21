@@ -161,6 +161,29 @@ public class OptionalTests {
     }
 
     [Fact]
+    public void Optional_ValueTypeNullOpt_ShouldBeEmpty() {
+        // Arrange & Act
+        var optional = Optional<int>.NullOpt;
+
+        // Assert
+        optional.HasValue.Should().BeFalse();
+        optional.IsEmpty.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Optional_ValueTypeTryGetValue_WithoutValue_ShouldReturnFalseAndDefault() {
+        // Arrange
+        var optional = Optional<int>.NullOpt;
+
+        // Act
+        var result = optional.TryGetValue(out var value);
+
+        // Assert
+        result.Should().BeFalse();
+        value.Should().Be(0);
+    }
+
+    [Fact]
     public void Optional_WithNullValue_ShouldBeEmpty() {
         // Arrange & Act
         Optional<string> optional = null!;
@@ -448,6 +471,18 @@ public class OptionalTests {
 
         // Assert
         result.Should().Be("default");
+    }
+
+    [Fact]
+    public void ValueOr_ValueTypeWithoutValue_ShouldReturnDefaultValue() {
+        // Arrange
+        var optional = Optional<int>.NullOpt;
+
+        // Act
+        var result = optional.ValueOr(99);
+
+        // Assert
+        result.Should().Be(99);
     }
 
     [Fact]

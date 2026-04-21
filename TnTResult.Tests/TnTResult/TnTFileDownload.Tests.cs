@@ -183,6 +183,30 @@ public class TnTFileDownloadTests {
     }
 
     [Fact]
+    public void TnTFileDownload_Json_Deserialize_UrlWithDataBeforeType()
+    {
+        // Arrange
+        const string json = """
+            {
+              "Filename": "file.txt",
+              "ContentType": "text/plain",
+              "Contents": {
+                "Data": "https://example.com/file.txt",
+                "Type": "System.String"
+              }
+            }
+            """;
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<TnTFileDownload>(json, options)!;
+
+        // Assert
+        deserialized.Contents.IsUrl.Should().BeTrue();
+        deserialized.Contents.Url.Should().Be("https://example.com/file.txt");
+    }
+
+    [Fact]
     public void TnTFileDownload_Json_SerializeDeserialize_EmptyByteArray()
     {
         // Arrange

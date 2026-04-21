@@ -42,7 +42,7 @@ public readonly struct Optional<OptType> {
     /// <summary>
     ///     Gets a value indicating whether this optional has a value.
     /// </summary>
-    public readonly bool HasValue => _value is not null;
+    public readonly bool HasValue => _hasValue;
 
     /// <summary>
     ///     Gets a value indicating whether this optional is empty.
@@ -53,8 +53,9 @@ public readonly struct Optional<OptType> {
     ///     Gets the value of the optional. Throws an <see cref="InvalidOperationException" /> if the optional is empty.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown if the optional is empty.</exception>
-    public readonly OptType Value => _value ?? throw new InvalidOperationException("Attempted to obtain the value of an optional, but this optional is empty");
+    public readonly OptType Value => _hasValue ? _value! : throw new InvalidOperationException("Attempted to obtain the value of an optional, but this optional is empty");
 
+    private readonly bool _hasValue;
     private readonly OptType? _value;
 
     /// <summary>
@@ -64,6 +65,7 @@ public readonly struct Optional<OptType> {
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="value" /> is null.</exception>
     private Optional(OptType value) {
         ArgumentNullException.ThrowIfNull(value, nameof(value));
+        _hasValue = true;
         _value = value;
     }
 
@@ -188,7 +190,7 @@ public readonly struct Optional<OptType> {
     /// <returns>True if the optional has a value; otherwise, false.</returns>
     public bool TryGetValue([MaybeNullWhen(false)] out OptType? value) {
         value = _value;
-        return HasValue;
+        return _hasValue;
     }
 
     /// <summary>

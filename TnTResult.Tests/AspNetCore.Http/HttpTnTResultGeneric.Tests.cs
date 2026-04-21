@@ -32,6 +32,7 @@ public class HttpTnTResultGenericTests {
         // Assert
         result.IsSuccessful.Should().BeFalse();
         result.Error.Should().BeOfType<ArgumentException>();
+        result.Result.Should().BeOfType<BadRequest<object>>();
     }
 
     [Fact]
@@ -144,6 +145,7 @@ public class HttpTnTResultGenericTests {
         // Assert
         result.IsSuccessful.Should().BeFalse();
         result.Error.Should().BeOfType<TnTResult.Exceptions.ForbiddenException>();
+        result.Result.Should().BeOfType<ForbidHttpResult>();
     }
 
     [Fact]
@@ -154,6 +156,7 @@ public class HttpTnTResultGenericTests {
         // Assert
         result.IsSuccessful.Should().BeFalse();
         result.Error.Should().BeOfType<TnTResult.Exceptions.NotFoundException>();
+        result.Result.Should().BeOfType<NotFound<object>>();
     }
 
     [Fact]
@@ -251,5 +254,6 @@ public class HttpTnTResultGenericTests {
         // Assert
         result.IsSuccessful.Should().BeFalse();
         result.Error.Should().BeOfType<UnauthorizedAccessException>();
+        result.Result.Should().BeOfType<UnauthorizedHttpResult>();
     }
 }

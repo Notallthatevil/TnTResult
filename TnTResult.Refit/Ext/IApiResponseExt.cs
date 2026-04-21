@@ -281,6 +281,9 @@ public static class IApiResponseExt {
     public static async Task<ITnTResult> ToTnTResultAsync(this Task<IApiResponse> task) {
         try {
             var apiResponse = await task.ConfigureAwait(false);
+            if (apiResponse is null) {
+                return TnTResult.Failure(new Exception("Failed with empty response from the server"));
+            }
             return HandleApiResponseWithTimeout(apiResponse, response => response.ToTnTResult());
         }
         catch (OperationCanceledException ex) {
@@ -298,6 +301,9 @@ public static class IApiResponseExt {
     public static async Task<ITnTResult<TSuccess>> ToTnTResultAsync<TSuccess>(this Task<IApiResponse<TSuccess>> task) {
         try {
             var apiResponse = await task.ConfigureAwait(false);
+            if (apiResponse is null) {
+                return TnTResult.Failure<TSuccess>(new Exception("Failed with empty response from the server"));
+            }
             return HandleApiResponseWithTimeout(apiResponse, response => response.ToTnTResult());
         }
         catch (OperationCanceledException ex) {
@@ -313,6 +319,9 @@ public static class IApiResponseExt {
     public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<IApiResponse<Stream>> task) {
         try {
             var apiResponse = await task.ConfigureAwait(false);
+            if (apiResponse is null) {
+                return TnTResult.Failure<TnTFileDownload>(new Exception("Failed with empty response from the server"));
+            }
             return HandleStreamApiResponseWithTimeout(apiResponse, response => response.ToTnTResult());
         }
         catch (OperationCanceledException ex) {
@@ -328,6 +337,9 @@ public static class IApiResponseExt {
     public static async Task<ITnTResult<TnTFileDownload>> ToTnTResultAsync(this Task<IApiResponse<TnTFileDownload>> task) {
         try {
             var apiResponse = await task.ConfigureAwait(false);
+            if (apiResponse is null) {
+                return TnTResult.Failure<TnTFileDownload>(new Exception("Failed with empty response from the server"));
+            }
             return HandleTnTFileDownloadResponseWithTimeout(apiResponse, response => response.ToTnTResult());
         }
         catch (OperationCanceledException ex) {
@@ -354,11 +366,8 @@ public static class IApiResponseExt {
     ///     Centralized error handling including RFC 7807 parsing and fallback strategies.
     /// </summary>
     private static ITnTResult<TSuccess> HandleErrorResponse<TSuccess>(IApiResponse apiResponse) {
-        if (IsProblemJsonContent(apiResponse) &&
-            apiResponse.Error?.Content is not null &&
-            TryParseProblemDetails(apiResponse.Error.Content, out var problemDetails) &&
-            !string.IsNullOrWhiteSpace(problemDetails?.Detail)) {
-            return TnTResult.Failure<TSuccess>(new Exception(problemDetails.Detail));
+        if (TryGetProblemDetailsDetail(apiResponse, out var problemDetail)) {
+            return TnTResult.Failure<TSuccess>(new Exception(problemDetail));
         }
 
         var errorMessage = apiResponse.StatusCode == HttpStatusCode.InternalServerError
@@ -380,8 +389,33 @@ public static class IApiResponseExt {
             ? TnTResult.Failure<TnTFileDownload>(new TimeoutException("The request timed out")) : converter(apiResponse);
 
     private static bool IsProblemJsonContent(IApiResponse apiResponse) =>
-        apiResponse.ContentHeaders?.ContentType?.ToString()
-            .Equals(ProblemJsonContentType, StringComparison.OrdinalIgnoreCase) == true;
+        string.Equals(
+            apiResponse.ContentHeaders?.ContentType?.MediaType,
+            ProblemJsonContentType,
+            StringComparison.OrdinalIgnoreCase);
+
+    private static bool TryGetProblemDetailsDetail(IApiResponse apiResponse, out string? detail) {
+        if (apiResponse.Error is ValidationApiException validationException &&
+            !string.IsNullOrWhiteSpace(validationException.Content?.Detail)) {
+            detail = validationException.Content.Detail;
+            return true;
+        }
+
+        if (!IsProblemJsonContent(apiResponse)) {
+            detail = null;
+            return false;
+        }
+
+        if (apiResponse.Error?.Content is not null &&
+            TryParseProblemDetails(apiResponse.Error.Content, out var problemDetails) &&
+            !string.IsNullOrWhiteSpace(problemDetails?.Detail)) {
+            detail = problemDetails.Detail;
+            return true;
+        }
+
+        detail = null;
+        return false;
+    }
 
     private static bool TryParseProblemDetails(string content, out ProblemDetails? problemDetails) {
         try {
