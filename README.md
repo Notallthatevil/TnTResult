@@ -1,3 +1,5 @@
+### Project moved to [NTResult](https://github.com/NT-Technologies/NTResult)
+---
 
 <p align="center">
   <img src="Logo.png" alt="TnTResult Logo" width="128" height="128" />
